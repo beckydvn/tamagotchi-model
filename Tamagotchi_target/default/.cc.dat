@@ -1,0 +1,6 @@
+# The contents of this file change when options that affect object files are updated
+
+unit_CC = $(CC)
+unit_CCFLAGS =
+unit_INCPATHS = \
+	$(INCLUDE_TAG)..

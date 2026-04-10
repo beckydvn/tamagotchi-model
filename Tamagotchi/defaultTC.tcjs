@@ -1,0 +1,15 @@
+let tc = TCF.define(TCF.CPP_TRANSFORM);
+tc.sources = [
+    'platform:/resource/Tamagotchi/CPPModel.emx#_drbAwDRcEfGs993j7RVgLQ',
+];
+tc.commonPreface = `
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+`;
+tc.compilationMakeType = MakeType.GNU_make;
+tc.createTargetProject = true;
+tc.targetConfiguration = 'WinT.x64-MinGw-12.2.0';
+tc.targetProject = 'Tamagotchi_target';
+tc.topCapsule = 'platform:/resource/Tamagotchi/CPPModel.emx#_PcRTEDRfEfGs993j7RVgLQ';

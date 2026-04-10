@@ -1,0 +1,9 @@
+# The contents of this file change when options that affect executables are updated
+
+unit_LD = $(LD)
+unit_LDFLAGS =
+unit_LIBS = 
+unit_LIBS_DEPS = 
+unit_USER_LIBS = 
+unit_USER_OBJS = 
+unit_USER_OBJS_LIST = $(unit_USER_OBJS)
