@@ -36,5 +36,5 @@ clean : $(CLEAN_TARGETS)
 
 clean_all : clean
 
-# C:\Users\rebec\eclipse-workspace\Tamagotchi\defaultTC.tcjs
+# C:\Users\rebec\eclipse-workspace\tamagotchi-model\Tamagotchi\defaultTC.tcjs
 include 0.mk

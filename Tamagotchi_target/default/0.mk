@@ -1,6 +1,6 @@
 # ##############################################################
 # Automatically-generated file. Do not edit!
-# Generated from C:\Users\rebec\eclipse-workspace\Tamagotchi\defaultTC.tcjs
+# Generated from C:\Users\rebec\eclipse-workspace\tamagotchi-model\Tamagotchi\defaultTC.tcjs
 0_TCONFIG_NAME = defaultTC
 
 0_CC = $(CC)
