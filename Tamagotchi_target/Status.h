@@ -16,6 +16,7 @@ public:
     Status_Actor & operator=( Status_Actor & ) = delete;
 protected:
     StatusProt::Base statusProt;
+    Timing::Base timingPort;
     std::string owner_name;
     std::string tama_name;
 private:
@@ -23,14 +24,30 @@ private:
     int discipline { 5 } ;
     int happiness { 5 } ;
     int health { 5 } ;
+    int rng { 0 } ;
 public:
     void showStatus( void );
 protected:
     INLINE_METHODS void enter3_Hatch( void );
     virtual void enterStateV( void ) override;
+    INLINE_METHODS void enter4_Idle( void );
+    INLINE_METHODS void enter5_Inc_Hunger( void );
+    INLINE_METHODS void enter6_Dec_Happiness( void );
+    INLINE_METHODS void enter7_Dec_Discipline( void );
+    INLINE_METHODS int guard5_50_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS int guard6_30_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS int guard7_20_chance( const void * rtdata, Timing::Base * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_initiate_hatch( void );
+    INLINE_CHAINS void chain3_start( void );
+    INLINE_CHAINS void chain4_timeout( void );
+    INLINE_CHAINS void chain5_50_chance( void );
+    INLINE_CHAINS void chain6_30_chance( void );
+    INLINE_CHAINS void chain7_20_chance( void );
+    INLINE_CHAINS void chain8_timeout_11( void );
+    INLINE_CHAINS void chain9_timeout_11( void );
+    INLINE_CHAINS void chain10_timeout_11( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

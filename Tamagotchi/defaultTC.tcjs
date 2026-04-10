@@ -11,5 +11,6 @@ tc.commonPreface = `
 tc.compilationMakeType = MakeType.GNU_make;
 tc.createTargetProject = true;
 tc.targetConfiguration = 'WinT.x64-MinGw-12.2.0';
-tc.targetProject = 'Tamagotchi_target';
+tc.targetLocation = 'C:\\Users\\rebec\\eclipse-workspace\\tamagotchi-model\\';
+tc.targetProject = '/Tamagotchi_target';
 tc.topCapsule = 'platform:/resource/Tamagotchi/CPPModel.emx#_PcRTEDRfEfGs993j7RVgLQ';
