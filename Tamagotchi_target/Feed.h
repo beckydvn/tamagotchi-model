@@ -18,7 +18,6 @@ public:
 protected:
     FeedProt::Conjugate feedPort;
     UpdateValProt::Base updateValPort;
-    Timing::Base timingPort;
 private:
     int snackCount { 0 } ;
 protected:
@@ -29,12 +28,15 @@ protected:
     INLINE_METHODS void transition4_snackCount_3( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS int guard5_else( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS void transition5_else( const void * rtdata, FeedProt::Conjugate * rtport );
+    INLINE_METHODS void transition6_getMeal( const void * rtdata, FeedProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_feed_activated( void );
     INLINE_CHAINS void chain3_getSnack( void );
     INLINE_CHAINS void chain4_snackCount_3( void );
     INLINE_CHAINS void chain5_else( void );
+    INLINE_CHAINS void chain6_getMeal( void );
+    INLINE_CHAINS void chain7_exit( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

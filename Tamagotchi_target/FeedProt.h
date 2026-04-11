@@ -20,6 +20,8 @@ struct FeedProt
     public:
         inline RTOutSignal initFeed( void );
         inline RTOutSignal feedSnack( void );
+        inline RTOutSignal feedMeal( void );
+        inline RTOutSignal exit( void );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -33,15 +35,19 @@ struct FeedProt
         {
             rti_initFeed = rtiLast_RTRootProtocol + 1
             , rti_feedSnack
+            , rti_feedMeal
+            , rti_exit
         };
     protected:
         enum
         {
-            rtiLast_FeedProt = rti_feedSnack
+            rtiLast_FeedProt = rti_exit
         };
     public:
         inline RTInSignal initFeed( void );
         inline RTInSignal feedSnack( void );
+        inline RTInSignal feedMeal( void );
+        inline RTInSignal exit( void );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -66,6 +72,16 @@ inline RTOutSignal FeedProt::Base::feedSnack( void )
     return RTOutSignal( this, Conjugate::rti_feedSnack, nullptr, &RTType_void );
 }
 
+inline RTOutSignal FeedProt::Base::feedMeal( void )
+{
+    return RTOutSignal( this, Conjugate::rti_feedMeal, nullptr, &RTType_void );
+}
+
+inline RTOutSignal FeedProt::Base::exit( void )
+{
+    return RTOutSignal( this, Conjugate::rti_exit, nullptr, &RTType_void );
+}
+
 inline FeedProt::Conjugate::Conjugate( void )
     : RTRootProtocol(  )
 {
@@ -83,6 +99,16 @@ inline RTInSignal FeedProt::Conjugate::initFeed( void )
 inline RTInSignal FeedProt::Conjugate::feedSnack( void )
 {
     return RTInSignal( this, rti_feedSnack );
+}
+
+inline RTInSignal FeedProt::Conjugate::feedMeal( void )
+{
+    return RTInSignal( this, rti_feedMeal );
+}
+
+inline RTInSignal FeedProt::Conjugate::exit( void )
+{
+    return RTInSignal( this, rti_exit );
 }
 
 #endif /* FeedProt_h */

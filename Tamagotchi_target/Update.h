@@ -47,6 +47,10 @@ protected:
     INLINE_METHODS void transition6_timeout( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS void transition7_updateHunger( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition8_updateHealth( const int * rtdata, UpdateValProt::Conjugate * rtport );
+    INLINE_METHODS int guard9_is_full( const int * rtdata, UpdateValProt::Conjugate * rtport );
+    INLINE_METHODS void transition9_is_full( const int * rtdata, UpdateValProt::Conjugate * rtport );
+    INLINE_METHODS int guard11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
+    INLINE_METHODS void transition11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_timeout( void );
@@ -56,6 +60,10 @@ private:
     INLINE_CHAINS void chain6_timeout( void );
     INLINE_CHAINS void chain7_updateHunger( void );
     INLINE_CHAINS void chain8_updateHealth( void );
+    INLINE_CHAINS void chain9_is_full( void );
+    INLINE_CHAINS void chain10_else( void );
+    INLINE_CHAINS void chain11_ill( void );
+    INLINE_CHAINS void chain12_else( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

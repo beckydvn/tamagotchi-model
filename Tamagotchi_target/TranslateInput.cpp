@@ -31,6 +31,13 @@ if(mode == "IDLE" && input == "FEED"){
 else if(mode == "FEED" && input == "SNACK"){
 	feedPort.feedSnack().send();
 }
+else if(mode == "FEED" && input == "MEAL"){
+	feedPort.feedMeal().send();
+}
+else if(mode == "FEED" && input == "EXIT"){
+	feedPort.exit().send();
+	mode = "IDLE";
+}
 //}}}USR
 }
 
@@ -51,7 +58,7 @@ INLINE_METHODS void TranslateInput_Actor::transition2_gotInput( const void * rtd
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Kiq10DXeEfGJaL0kWrhu3A
 input = (const char *)rtdata;
-std::cout<< "TRANSLATE INPUT RECEIVED: " << input << std::endl;
+
 //}}}USR
 }
 
@@ -59,7 +66,7 @@ INLINE_METHODS void TranslateInput_Actor::transition3_gotInput( const void * rtd
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Nd20kDXeEfGJaL0kWrhu3A
 input = (const char *)rtdata;
-std::cout<< "TRANSLATE INPUT RECEIVED: " << input << std::endl;
+
 //}}}USR
 }
 

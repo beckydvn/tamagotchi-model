@@ -19,6 +19,8 @@ static const char * const rtg_state_names[] =
     , "Idle"
     , "RNGVal"
     , ""
+    , ""
+    , ""
 };
 
 static const RTInterfaceDescriptor rtg_interfaces_input[] =
@@ -157,7 +159,6 @@ std::cout<< "\n" << tname << " LOOKS HAPPY TO MEET YOU, " << owner_name << "!" <
 
 std::cout<< "\nINITIALIZING STATS..." <<std::endl;
 showStatus();
-
 statusPort.hatch().send();
 timingPort.informIn(RTTimespec(0.5,0));
 //}}}USR
@@ -237,25 +238,51 @@ discipline -= 1;
 INLINE_METHODS void Update_Actor::transition6_timeout( const void * rtdata, Timing::Base * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_3dEs4DX8EfGJaL0kWrhu3A
-timingPort.informEvery(RTTimespec(5,0));
+timingPort.informEvery(RTTimespec(10,0));
 //}}}USR
 }
 
 INLINE_METHODS void Update_Actor::transition7_updateHunger( const int * rtdata, UpdateValProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_0y1oIDXkEfGJaL0kWrhu3A
-std::cout<< "HUNGER BEFORE: " << hunger << std::endl;
 hunger += *rtdata;
-std::cout<< "HUNGER AFTER: " << hunger << std::endl;
+showStatus();
 //}}}USR
 }
 
 INLINE_METHODS void Update_Actor::transition8_updateHealth( const int * rtdata, UpdateValProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_wL2YcDXwEfGJaL0kWrhu3A
-std::cout<< "HEALTH BEFORE: " << health << std::endl;
 health += *rtdata;
-std::cout<< "HEALTH AFTER: " << health << std::endl;
+showStatus();
+//}}}USR
+}
+
+INLINE_METHODS int Update_Actor::guard9_is_full( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_2mxsIDX-EfGJaL0kWrhu3A
+return (hunger <= 0);
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition9_is_full( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_9EFGwDX-EfGJaL0kWrhu3A
+std::cout<< tama_name << " IS FEELING FULL..." << std::endl;
+//}}}USR
+}
+
+INLINE_METHODS int Update_Actor::guard11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_XP1pADX_EfGJaL0kWrhu3A
+return (health <= 5);
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_aBWuYDX_EfGJaL0kWrhu3A
+std::cout<< tama_name << " IS FEELING ILL..." << std::endl;
 //}}}USR
 }
 
@@ -334,7 +361,12 @@ INLINE_CHAINS void Update_Actor::chain7_updateHunger( void )
     rtgTransitionBegin(  );
     transition7_updateHunger( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
-    enterState( 3 );
+    if( guard9_is_full( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain9_is_full(  );
+        return ;
+    }
+    chain10_else(  );
 }
 
 INLINE_CHAINS void Update_Actor::chain8_updateHealth( void )
@@ -343,6 +375,45 @@ INLINE_CHAINS void Update_Actor::chain8_updateHealth( void )
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     transition8_updateHealth( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    if( guard11_ill( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain11_ill(  );
+        return ;
+    }
+    chain12_else(  );
+}
+
+INLINE_CHAINS void Update_Actor::chain9_is_full( void )
+{
+    rtgChainBegin( 5, "is full" );
+    rtgTransitionBegin(  );
+    transition9_is_full( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Update_Actor::chain10_else( void )
+{
+    rtgChainBegin( 5, "else" );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Update_Actor::chain11_ill( void )
+{
+    rtgChainBegin( 6, "ill" );
+    rtgTransitionBegin(  );
+    transition11_ill( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Update_Actor::chain12_else( void )
+{
+    rtgChainBegin( 6, "else" );
+    rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
