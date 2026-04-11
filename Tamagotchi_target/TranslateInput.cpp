@@ -8,7 +8,7 @@ static const char * const rtg_state_names[] =
 {
     "<machine>"
     , "Start"
-    , "SendSignals"
+    , "Send Signals"
 };
 
 #define SUPER RTActor
@@ -21,11 +21,15 @@ TranslateInput_Actor::~TranslateInput_Actor( void )
 {
 }
 
-INLINE_METHODS void TranslateInput_Actor::enter3_SendSignals( void )
+INLINE_METHODS void TranslateInput_Actor::enter3_Send_Signals( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_doD84DXfEfGJaL0kWrhu3A
-if(input == "FEED"){
+if(mode == "IDLE" && input == "FEED"){
 	feedPort.initFeed().send();
+	mode = "FEED";
+}
+else if(mode == "FEED" && input == "SNACK"){
+	feedPort.feedSnack().send();
 }
 //}}}USR
 }
@@ -35,7 +39,7 @@ void TranslateInput_Actor::enterStateV( void )
     switch( getCurrentState() )
     {
     case 3:
-        enter3_SendSignals(  );
+        enter3_Send_Signals(  );
         break;
     default:
         RTActor::enterStateV(  );
@@ -137,7 +141,7 @@ void TranslateInput_Actor::rtsBehavior( int signalIndex, int portIndex )
                     break;
                 }
                 break;
-            case 3 /* SendSignals (State Machine::SendSignals) */:
+            case 3 /* Send Signals (State Machine::Send Signals) */:
                 switch( portIndex )
                 {
                 case 0 /*RTControlPort*/:

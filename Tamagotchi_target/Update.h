@@ -6,6 +6,7 @@
 #endif
 #include <UnitName.h>
 #include <StatusProt.h>
+#include <UpdateValProt.h>
 #define SUPER RTActor
 class Update_Actor : public RTActor
 {
@@ -21,6 +22,7 @@ protected:
     Frame::Base frameP;
     Timing::Base timingPort;
     StatusProt::Base statusPort;
+    UpdateValProt::Conjugate updateValPort;
     std::string owner_name;
 public:
     std::string tama_name;
@@ -36,22 +38,24 @@ protected:
     INLINE_METHODS void enter2_Hatch( void );
     virtual void enterStateV( void ) override;
     INLINE_METHODS void enter3_Idle( void );
-    INLINE_METHODS void enter4_Inc_Hunger( void );
-    INLINE_METHODS void enter5_Dec_Happiness( void );
-    INLINE_METHODS void enter6_Dec_Discipline( void );
-    INLINE_METHODS int guard3_50_chance( const void * rtdata, Timing::Base * rtport );
-    INLINE_METHODS int guard4_30_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS int guard3_inc_hunger_50_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition3_inc_hunger_50_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS int guard4_dec_happiness_30_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition4_dec_happiness_30_chance( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS int guard5_20_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition5_20_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition6_timeout( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition7_updateHunger( const int * rtdata, UpdateValProt::Conjugate * rtport );
+    INLINE_METHODS void transition8_updateHealth( const int * rtdata, UpdateValProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_timeout( void );
-    INLINE_CHAINS void chain3_50_chance( void );
-    INLINE_CHAINS void chain4_30_chance( void );
+    INLINE_CHAINS void chain3_inc_hunger_50_chance( void );
+    INLINE_CHAINS void chain4_dec_happiness_30_chance( void );
     INLINE_CHAINS void chain5_20_chance( void );
     INLINE_CHAINS void chain6_timeout( void );
-    INLINE_CHAINS void chain7_timeout_10( void );
-    INLINE_CHAINS void chain8_timeout_10( void );
-    INLINE_CHAINS void chain9_timeout_10( void );
+    INLINE_CHAINS void chain7_updateHunger( void );
+    INLINE_CHAINS void chain8_updateHealth( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

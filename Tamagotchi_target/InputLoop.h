@@ -1,20 +1,20 @@
-#ifndef Input_h
-#define Input_h
+#ifndef InputLoop_h
+#define InputLoop_h
 
 #ifdef PRAGMA
-#pragma interface "Input.h"
+#pragma interface "InputLoop.h"
 #endif
 #include <UnitName.h>
 #include <InputProt.h>
 #include <StatusProt.h>
 #define SUPER RTActor
-class Input_Actor : public RTActor
+class InputLoop_Actor : public RTActor
 {
 public:
-    Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref );
-    virtual ~Input_Actor( void );
-    Input_Actor( const Input_Actor & ) = delete;
-    Input_Actor & operator=( Input_Actor & ) = delete;
+    InputLoop_Actor( RTController * rtg_rts, RTActorRef * rtg_ref );
+    virtual ~InputLoop_Actor( void );
+    InputLoop_Actor( const InputLoop_Actor & ) = delete;
+    InputLoop_Actor & operator=( InputLoop_Actor & ) = delete;
 protected:
     StatusProt::Conjugate statusPort;
     InputProt::Base inputPort;
@@ -35,5 +35,5 @@ public:
     virtual int _followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex ) override;
 };
 #undef SUPER
-extern const RTActorClass Input;
-#endif /* Input_h */
+extern const RTActorClass InputLoop;
+#endif /* InputLoop_h */

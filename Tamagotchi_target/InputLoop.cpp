@@ -1,8 +1,8 @@
 #if defined( PRAGMA ) && ! defined( PRAGMA_IMPLEMENTED )
-#pragma implementation "Input.h"
+#pragma implementation "InputLoop.h"
 #endif
 #include <UnitName.h>
-#include <Input.h>
+#include <InputLoop.h>
 
 static const char * const rtg_state_names[] =
 {
@@ -12,16 +12,16 @@ static const char * const rtg_state_names[] =
 };
 
 #define SUPER RTActor
-Input_Actor::Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+InputLoop_Actor::InputLoop_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
 {
 }
 
-Input_Actor::~Input_Actor( void )
+InputLoop_Actor::~InputLoop_Actor( void )
 {
 }
 
-INLINE_METHODS void Input_Actor::enter3_Take_Input( void )
+INLINE_METHODS void InputLoop_Actor::enter3_Take_Input( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Z0mKADUpEfGJaL0kWrhu3A
 char userInput[256];
@@ -40,7 +40,7 @@ while(true){
 //}}}USR
 }
 
-void Input_Actor::enterStateV( void )
+void InputLoop_Actor::enterStateV( void )
 {
     switch( getCurrentState() )
     {
@@ -53,7 +53,7 @@ void Input_Actor::enterStateV( void )
     }
 }
 
-INLINE_CHAINS void Input_Actor::chain1_Initial( void )
+INLINE_CHAINS void InputLoop_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
     rtgTransitionBegin(  );
@@ -61,7 +61,7 @@ INLINE_CHAINS void Input_Actor::chain1_Initial( void )
     enterState( 2 );
 }
 
-INLINE_CHAINS void Input_Actor::chain2_hatch( void )
+INLINE_CHAINS void InputLoop_Actor::chain2_hatch( void )
 {
     rtgChainBegin( 2, "hatch" );
     exitState( rtg_parent_state );
@@ -70,7 +70,7 @@ INLINE_CHAINS void Input_Actor::chain2_hatch( void )
     enterState( 3 );
 }
 
-void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
+void InputLoop_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
         {
@@ -143,42 +143,42 @@ void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
         }
 }
 
-const RTStateId Input_Actor::rtg_parent_state[] =
+const RTStateId InputLoop_Actor::rtg_parent_state[] =
 {
     0
     , 1
     , 1
 };
 
-const RTActor_class * Input_Actor::getActorData( void ) const
+const RTActor_class * InputLoop_Actor::getActorData( void ) const
 {
-    return &Input_Actor::rtg_class;
+    return &InputLoop_Actor::rtg_class;
 }
 
-const RTActor_class Input_Actor::rtg_class =
+const RTActor_class InputLoop_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
     , 3
-    , Input_Actor::rtg_parent_state
-    , &Input
+    , InputLoop_Actor::rtg_parent_state
+    , &InputLoop
     , 0
     , nullptr
     , 2
-    , Input_Actor::rtg_ports
+    , InputLoop_Actor::rtg_ports
     , 0
     , nullptr
     , 0
     , nullptr
 };
 
-const RTPortDescriptor Input_Actor::rtg_ports[] =
+const RTPortDescriptor InputLoop_Actor::rtg_ports[] =
 {
     {
         "statusPort"
         , nullptr
         , &StatusProt::Conjugate::rt_class
-        , RTOffsetOf( Input_Actor, statusPort )
+        , RTOffsetOf( InputLoop_Actor, statusPort )
         , 1
         , 1
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
@@ -187,14 +187,14 @@ const RTPortDescriptor Input_Actor::rtg_ports[] =
         "inputPort"
         , nullptr
         , &InputProt::Base::rt_class
-        , RTOffsetOf( Input_Actor, inputPort )
+        , RTOffsetOf( InputLoop_Actor, inputPort )
         , 1
         , 2
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
 
-int Input_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
+int InputLoop_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
 {
     switch( rtg_portId )
     {
@@ -235,18 +235,18 @@ static const RTRelayDescriptor rtg_relays[] =
     }
 };
 
-static RTActor * new_Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+static RTActor * new_InputLoop_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
 {
-    return new Input_Actor( rtg_rts, rtg_ref );
+    return new InputLoop_Actor( rtg_rts, rtg_ref );
 }
 
-const RTActorClass Input =
+const RTActorClass InputLoop =
 {
     nullptr
-    , "Input"
+    , "InputLoop"
     , 0 /*RTVersionId*/
     , 2
     , rtg_relays
-    , new_Input_Actor
+    , new_InputLoop_Actor
 };
 

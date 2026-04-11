@@ -9,6 +9,7 @@ static const char * const rtg_state_names[] =
     "<machine>"
     , "Start"
     , "Initialize Feed"
+    , ""
 };
 
 #define SUPER RTActor
@@ -41,6 +42,45 @@ void Feed_Actor::enterStateV( void )
     }
 }
 
+INLINE_METHODS void Feed_Actor::transition3_getSnack( const void * rtdata, FeedProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_UGBWMDXwEfGJaL0kWrhu3A
+std::cout<< "\nYOU FED YOUR PET A SNACK." <<std::endl;
+snackCount += 1;
+//}}}USR
+}
+
+INLINE_METHODS int Feed_Actor::guard4_snackCount_3( const void * rtdata, FeedProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_6LJIkDXvEfGJaL0kWrhu3A
+return (snackCount < 3);
+//}}}USR
+}
+
+INLINE_METHODS void Feed_Actor::transition4_snackCount_3( const void * rtdata, FeedProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_AJn4MDX7EfGJaL0kWrhu3A
+std::cout<< "\nYOUR PET LOVES THE SWEET TREAT!" <<std::endl;
+updateValPort.updateHunger(2).send();
+//}}}USR
+}
+
+INLINE_METHODS int Feed_Actor::guard5_else( const void * rtdata, FeedProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_B6KpwDXwEfGJaL0kWrhu3A
+return (snackCount >= 3);
+//}}}USR
+}
+
+INLINE_METHODS void Feed_Actor::transition5_else( const void * rtdata, FeedProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_EMqP0DX7EfGJaL0kWrhu3A
+std::cout<< "\nYOUR PET DOESN'T FEEL TOO GOOD..." <<std::endl;
+updateValPort.updateHunger(3).send();
+updateValPort.updateHealth(-3).send();
+//}}}USR
+}
+
 INLINE_CHAINS void Feed_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
@@ -54,6 +94,43 @@ INLINE_CHAINS void Feed_Actor::chain2_feed_activated( void )
     rtgChainBegin( 2, "feed activated" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Feed_Actor::chain3_getSnack( void )
+{
+    rtgChainBegin( 3, "getSnack" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition3_getSnack( msg->data, static_cast< FeedProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    if( guard4_snackCount_3( msg->data, static_cast< FeedProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain4_snackCount_3(  );
+        return ;
+    }
+    if( guard5_else( msg->data, static_cast< FeedProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain5_else(  );
+        return ;
+    }
+}
+
+INLINE_CHAINS void Feed_Actor::chain4_snackCount_3( void )
+{
+    rtgChainBegin( 4, "snackCount < 3" );
+    rtgTransitionBegin(  );
+    transition4_snackCount_3( msg->data, static_cast< FeedProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Feed_Actor::chain5_else( void )
+{
+    rtgChainBegin( 4, "else" );
+    rtgTransitionBegin(  );
+    transition5_else( msg->data, static_cast< FeedProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
@@ -120,6 +197,16 @@ void Feed_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
+                case 1 /*feedPort*/:
+                    switch( signalIndex )
+                    {
+                    case FeedProt::Conjugate::rti_feedSnack:
+                        chain3_getSnack(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -152,12 +239,12 @@ const RTActor_class Feed_Actor::rtg_class =
     , &Feed
     , 0
     , nullptr
-    , 1
+    , 3
     , Feed_Actor::rtg_ports
     , 0
     , nullptr
-    , 0
-    , nullptr
+    , 1
+    , Feed_Actor::rtg_Feed_Actor_fields
 };
 
 const RTPortDescriptor Feed_Actor::rtg_ports[] =
@@ -171,6 +258,34 @@ const RTPortDescriptor Feed_Actor::rtg_ports[] =
         , 1
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
+    , {
+        "updateValPort"
+        , nullptr
+        , &UpdateValProt::Base::rt_class
+        , RTOffsetOf( Feed_Actor, updateValPort )
+        , 1
+        , 2
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "timingPort"
+        , nullptr
+        , &Timing::Base::rt_class
+        , RTOffsetOf( Feed_Actor, timingPort )
+        , 1
+        , 3
+        , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+};
+
+const RTFieldDescriptor Feed_Actor::rtg_Feed_Actor_fields[] =
+{
+    {
+        "snackCount"
+        , RTOffsetOf( Feed_Actor, snackCount )
+        , &RTType_int
+        , nullptr
+    }
 };
 
 int Feed_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
@@ -181,6 +296,14 @@ int Feed_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repI
         if( rtg_repIndex < 1 )
         {
             rtg_end.port = &feedPort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
+    case 1:
+        if( rtg_repIndex < 1 )
+        {
+            rtg_end.port = &updateValPort;
             rtg_end.index = rtg_repIndex;
             return 1;
         }
@@ -199,6 +322,11 @@ static const RTRelayDescriptor rtg_relays[] =
         , &FeedProt::Conjugate::rt_class
         , 1
     }
+    , {
+        "updateValPort"
+        , &UpdateValProt::Base::rt_class
+        , 1
+    }
 };
 
 static RTActor * new_Feed_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
@@ -211,7 +339,7 @@ const RTActorClass Feed =
     nullptr
     , "Feed"
     , 0 /*RTVersionId*/
-    , 1
+    , 2
     , rtg_relays
     , new_Feed_Actor
 };

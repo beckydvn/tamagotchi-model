@@ -34,13 +34,18 @@ const RTProtocolDescriptor FeedProt::Conjugate::rt_class =
     , &FeedProt::Base::rt_class
     , "FeedProt"
     , 0
-    , 3
+    , 4
     , FeedProt::Conjugate::rt_signals
 };
 
 const RTSignalDescriptor FeedProt::Conjugate::rt_signals[] =
 {
     {
+        "feedSnack"
+        , &RTType_void
+        , FeedProt::Conjugate::rti_feedSnack
+    }
+    , {
         "initFeed"
         , &RTType_void
         , FeedProt::Conjugate::rti_initFeed

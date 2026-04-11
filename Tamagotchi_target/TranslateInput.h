@@ -20,8 +20,9 @@ protected:
     FeedProt::Base feedPort;
 private:
     std::string input;
+    std::string mode { "IDLE" } ;
 protected:
-    INLINE_METHODS void enter3_SendSignals( void );
+    INLINE_METHODS void enter3_Send_Signals( void );
     virtual void enterStateV( void ) override;
     INLINE_METHODS void transition2_gotInput( const void * rtdata, InputProt::Conjugate * rtport );
     INLINE_METHODS void transition3_gotInput( const void * rtdata, InputProt::Conjugate * rtport );

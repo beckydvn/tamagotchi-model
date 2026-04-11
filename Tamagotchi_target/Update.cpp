@@ -8,7 +8,7 @@
 
 extern const RTActorClass Feed;
 
-extern const RTActorClass Input;
+extern const RTActorClass InputLoop;
 
 extern const RTActorClass TranslateInput;
 
@@ -17,9 +17,6 @@ static const char * const rtg_state_names[] =
     "<machine>"
     , "Hatch"
     , "Idle"
-    , "Inc Hunger"
-    , "Dec Happiness"
-    , "Dec Discipline"
     , "RNGVal"
     , ""
 };
@@ -54,6 +51,10 @@ static const RTInterfaceDescriptor rtg_interfaces_feed[] =
         "feedPort"
         , 1
     }
+    , {
+        "updateValPort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_feed[] =
@@ -61,6 +62,10 @@ static const RTBindingDescriptor rtg_bindings_feed[] =
     {
         0
         , &FeedProt::Base::rt_class
+    }
+    , {
+        1
+        , &UpdateValProt::Conjugate::rt_class
     }
 };
 
@@ -151,6 +156,7 @@ owner_name = oname;
 std::cout<< "\n" << tname << " LOOKS HAPPY TO MEET YOU, " << owner_name << "!" <<std::endl;
 
 std::cout<< "\nINITIALIZING STATS..." <<std::endl;
+showStatus();
 
 statusPort.hatch().send();
 timingPort.informIn(RTTimespec(0.5,0));
@@ -167,15 +173,6 @@ void Update_Actor::enterStateV( void )
     case 3:
         enter3_Idle(  );
         break;
-    case 4:
-        enter4_Inc_Hunger(  );
-        break;
-    case 5:
-        enter5_Dec_Happiness(  );
-        break;
-    case 6:
-        enter6_Dec_Discipline(  );
-        break;
     default:
         RTActor::enterStateV(  );
         break;
@@ -184,56 +181,41 @@ void Update_Actor::enterStateV( void )
 
 INLINE_METHODS void Update_Actor::enter3_Idle( void )
 {
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#__QRG0DUUEfGPsvtei6AytQ
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_7GC-sDX8EfGJaL0kWrhu3A
 // here, we randomly generate the next event.
 // discipline, happiness, and hunger all change over time (the first two decrease, the latter increases).
-// every 5 seconds, we randomly pick one of the 3 to decrease/increase by 1 point.
+// every time we receive a "timeout," we randomly pick one of the 3 to decrease/increase by 1 point.
 rng = (rand() % 100);
-timingPort.informIn(RTTimespec(5,0));
 //}}}USR
 }
 
-INLINE_METHODS void Update_Actor::enter4_Inc_Hunger( void )
-{
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_LWNdkDUYEfGJaL0kWrhu3A
-std::cout<< "\n" << tama_name << " IS GETTING HUNGRY..." <<std::endl;
-hunger += 1;
-timingPort.informIn(RTTimespec(0.2,0));
-
-//}}}USR
-}
-
-INLINE_METHODS void Update_Actor::enter5_Dec_Happiness( void )
-{
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_IrkNgDUeEfGJaL0kWrhu3A
-std::cout<< "\n" << tama_name << " IS GETTING BORED..." <<std::endl;
-happiness -= 1;
-timingPort.informIn(RTTimespec(0.2,0));
-
-//}}}USR
-}
-
-INLINE_METHODS void Update_Actor::enter6_Dec_Discipline( void )
-{
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_8_H_EDUeEfGJaL0kWrhu3A
-std::cout<< "\n" << tama_name << " IS GETTING ROWDY..." <<std::endl;
-discipline -= 1;
-timingPort.informIn(RTTimespec(0.2,0));
-
-//}}}USR
-}
-
-INLINE_METHODS int Update_Actor::guard3_50_chance( const void * rtdata, Timing::Base * rtport )
+INLINE_METHODS int Update_Actor::guard3_inc_hunger_50_chance( const void * rtdata, Timing::Base * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_QnuoQDUdEfGJaL0kWrhu3A
 return (rng <= 50);
 //}}}USR
 }
 
-INLINE_METHODS int Update_Actor::guard4_30_chance( const void * rtdata, Timing::Base * rtport )
+INLINE_METHODS void Update_Actor::transition3_inc_hunger_50_chance( const void * rtdata, Timing::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_nHuvwDX0EfGJaL0kWrhu3A
+std::cout<< "\n" << tama_name << " IS GETTING HUNGRY..." <<std::endl;
+hunger += 1;
+//}}}USR
+}
+
+INLINE_METHODS int Update_Actor::guard4_dec_happiness_30_chance( const void * rtdata, Timing::Base * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_UKgWADUeEfGJaL0kWrhu3A
 return (rng > 50 && rng <= 80);
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition4_dec_happiness_30_chance( const void * rtdata, Timing::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_rfzjQDX0EfGJaL0kWrhu3A
+std::cout<< "\n" << tama_name << " IS GETTING BORED..." <<std::endl;
+happiness -= 1;
 //}}}USR
 }
 
@@ -241,6 +223,39 @@ INLINE_METHODS int Update_Actor::guard5_20_chance( const void * rtdata, Timing::
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_y1jHADUeEfGJaL0kWrhu3A
 return (rng > 80 && rng <= 100);
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition5_20_chance( const void * rtdata, Timing::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_8hdGYDX0EfGJaL0kWrhu3A
+std::cout<< "\n" << tama_name << " IS GETTING ROWDY..." <<std::endl;
+discipline -= 1;
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition6_timeout( const void * rtdata, Timing::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_3dEs4DX8EfGJaL0kWrhu3A
+timingPort.informEvery(RTTimespec(5,0));
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition7_updateHunger( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_0y1oIDXkEfGJaL0kWrhu3A
+std::cout<< "HUNGER BEFORE: " << hunger << std::endl;
+hunger += *rtdata;
+std::cout<< "HUNGER AFTER: " << hunger << std::endl;
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition8_updateHealth( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_wL2YcDXwEfGJaL0kWrhu3A
+std::cout<< "HEALTH BEFORE: " << health << std::endl;
+health += *rtdata;
+std::cout<< "HEALTH AFTER: " << health << std::endl;
 //}}}USR
 }
 
@@ -258,14 +273,14 @@ INLINE_CHAINS void Update_Actor::chain2_timeout( void )
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
-    if( guard3_50_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) ) )
+    if( guard3_inc_hunger_50_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) ) )
     {
-        chain3_50_chance(  );
+        chain3_inc_hunger_50_chance(  );
         return ;
     }
-    if( guard4_30_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) ) )
+    if( guard4_dec_happiness_30_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) ) )
     {
-        chain4_30_chance(  );
+        chain4_dec_happiness_30_chance(  );
         return ;
     }
     if( guard5_20_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) ) )
@@ -275,28 +290,31 @@ INLINE_CHAINS void Update_Actor::chain2_timeout( void )
     }
 }
 
-INLINE_CHAINS void Update_Actor::chain3_50_chance( void )
+INLINE_CHAINS void Update_Actor::chain3_inc_hunger_50_chance( void )
 {
-    rtgChainBegin( 7, "50% chance" );
+    rtgChainBegin( 4, "inc hunger (50% chance)" );
     rtgTransitionBegin(  );
+    transition3_inc_hunger_50_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
-    enterState( 4 );
+    enterState( 3 );
 }
 
-INLINE_CHAINS void Update_Actor::chain4_30_chance( void )
+INLINE_CHAINS void Update_Actor::chain4_dec_happiness_30_chance( void )
 {
-    rtgChainBegin( 7, "30% chance" );
+    rtgChainBegin( 4, "dec happiness (30% chance)" );
     rtgTransitionBegin(  );
+    transition4_dec_happiness_30_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
-    enterState( 5 );
+    enterState( 3 );
 }
 
 INLINE_CHAINS void Update_Actor::chain5_20_chance( void )
 {
-    rtgChainBegin( 7, "20% chance" );
+    rtgChainBegin( 4, "20% chance" );
     rtgTransitionBegin(  );
+    transition5_20_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
-    enterState( 6 );
+    enterState( 3 );
 }
 
 INLINE_CHAINS void Update_Actor::chain6_timeout( void )
@@ -304,42 +322,27 @@ INLINE_CHAINS void Update_Actor::chain6_timeout( void )
     rtgChainBegin( 2, "timeout" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
+    transition6_timeout( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
 
-INLINE_CHAINS void Update_Actor::chain7_timeout_10( void )
+INLINE_CHAINS void Update_Actor::chain7_updateHunger( void )
 {
-    rtgChainBegin( 6, "timeout" );
+    rtgChainBegin( 3, "updateHunger" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    rtgChainBegin( 8, "return" );
-    rtgTransitionBegin(  );
+    transition7_updateHunger( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
 
-INLINE_CHAINS void Update_Actor::chain8_timeout_10( void )
+INLINE_CHAINS void Update_Actor::chain8_updateHealth( void )
 {
-    rtgChainBegin( 5, "timeout" );
+    rtgChainBegin( 3, "updateHealth" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    rtgChainBegin( 8, "return" );
-    rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    enterState( 3 );
-}
-
-INLINE_CHAINS void Update_Actor::chain9_timeout_10( void )
-{
-    rtgChainBegin( 4, "timeout" );
-    exitState( rtg_parent_state );
-    rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    rtgChainBegin( 8, "return" );
-    rtgTransitionBegin(  );
+    transition8_updateHealth( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
@@ -416,79 +419,14 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                default:
-                    break;
-                }
-                break;
-            case 4 /* Inc Hunger (State Machine::Inc Hunger) */:
-                switch( portIndex )
-                {
-                case 0 /*RTControlPort*/:
+                case 4 /*updateValPort*/:
                     switch( signalIndex )
                     {
-                    case 1 /*RTInitSignal*/:
+                    case UpdateValProt::Conjugate::rti_updateHealth:
+                        chain8_updateHealth(  );
                         return ;
-                    default:
-                        break;
-                    }
-                    break;
-                case 2 /*timingPort*/:
-                    switch( signalIndex )
-                    {
-                    case Timing::Base::rti_timeout:
-                        chain9_timeout_10(  );
-                        return ;
-                    default:
-                        break;
-                    }
-                    break;
-                default:
-                    break;
-                }
-                break;
-            case 5 /* Dec Happiness (State Machine::Dec Happiness) */:
-                switch( portIndex )
-                {
-                case 0 /*RTControlPort*/:
-                    switch( signalIndex )
-                    {
-                    case 1 /*RTInitSignal*/:
-                        return ;
-                    default:
-                        break;
-                    }
-                    break;
-                case 2 /*timingPort*/:
-                    switch( signalIndex )
-                    {
-                    case Timing::Base::rti_timeout:
-                        chain8_timeout_10(  );
-                        return ;
-                    default:
-                        break;
-                    }
-                    break;
-                default:
-                    break;
-                }
-                break;
-            case 6 /* Dec Discipline (State Machine::Dec Discipline) */:
-                switch( portIndex )
-                {
-                case 0 /*RTControlPort*/:
-                    switch( signalIndex )
-                    {
-                    case 1 /*RTInitSignal*/:
-                        return ;
-                    default:
-                        break;
-                    }
-                    break;
-                case 2 /*timingPort*/:
-                    switch( signalIndex )
-                    {
-                    case Timing::Base::rti_timeout:
-                        chain7_timeout_10(  );
+                    case UpdateValProt::Conjugate::rti_updateHunger:
+                        chain7_updateHunger(  );
                         return ;
                     default:
                         break;
@@ -510,9 +448,6 @@ const RTStateId Update_Actor::rtg_parent_state[] =
     0
     , 1
     , 1
-    , 1
-    , 1
-    , 1
 };
 
 const RTActor_class * Update_Actor::getActorData( void ) const
@@ -524,12 +459,12 @@ const RTActor_class Update_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
-    , 6
+    , 3
     , Update_Actor::rtg_parent_state
     , &Update
     , 3
     , Update_Actor::rtg_capsule_roles
-    , 3
+    , 4
     , Update_Actor::rtg_ports
     , 0
     , nullptr
@@ -541,7 +476,7 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
 {
     {
         "input"
-        , &Input
+        , &InputLoop
         , RTOffsetOf( Update_Actor, input )
         , 1
         , RTComponentDescriptor::Optional
@@ -560,9 +495,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 1
+        , 2
         , rtg_interfaces_feed
-        , 1
+        , 2
         , rtg_bindings_feed
     }
     , {
@@ -607,6 +542,15 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , RTOffsetOf( Update_Actor, statusPort )
         , 1
         , 3
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "updateValPort"
+        , nullptr
+        , &UpdateValProt::Conjugate::rt_class
+        , RTOffsetOf( Update_Actor, updateValPort )
+        , 1
+        , 4
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
@@ -674,6 +618,14 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
         case 0:
             if( rtg_repIndex < 1 )
                 return translateInput._followIn( rtg_end, 1, rtg_repIndex );
+            break;
+        case 1:
+            if( rtg_repIndex < 1 )
+            {
+                rtg_end.port = &updateValPort;
+                rtg_end.index = rtg_repIndex;
+                return 1;
+            }
             break;
         default:
             break;
