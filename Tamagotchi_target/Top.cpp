@@ -4,28 +4,12 @@
 #include <UnitName.h>
 #include <Top.h>
 
-extern const RTActorClass Status;
+extern const RTActorClass MainGame;
 
 static const char * const rtg_state_names[] =
 {
     "<machine>"
     , "Start"
-};
-
-static const RTInterfaceDescriptor rtg_interfaces_status[] =
-{
-    {
-        "statusProt"
-        , 1
-    }
-};
-
-static const RTBindingDescriptor rtg_bindings_status[] =
-{
-    {
-        0
-        , &StatusProt::Conjugate::rt_class
-    }
 };
 
 #define SUPER RTActor
@@ -42,7 +26,6 @@ INLINE_METHODS void Top_Actor::transition1_Initial( const void * rtdata, RTProto
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_N3jGEDRhEfGs993j7RVgLQ
 std::cout<< "\nSTARTING GAME...\n" <<std::endl;
-statusProt.hatch().send();
 //}}}USR
 }
 
@@ -122,8 +105,8 @@ const RTActor_class Top_Actor::rtg_class =
     , &Top
     , 1
     , Top_Actor::rtg_capsule_roles
-    , 1
-    , Top_Actor::rtg_ports
+    , 0
+    , nullptr
     , 0
     , nullptr
     , 0
@@ -134,56 +117,18 @@ const RTComponentDescriptor Top_Actor::rtg_capsule_roles[] =
 {
     {
         "status"
-        , &Status
+        , &MainGame
         , RTOffsetOf( Top_Actor, status )
         , 1
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 1
-        , rtg_interfaces_status
-        , 1
-        , rtg_bindings_status
-    }
-};
-
-const RTPortDescriptor Top_Actor::rtg_ports[] =
-{
-    {
-        "statusProt"
+        , 0
         , nullptr
-        , &StatusProt::Conjugate::rt_class
-        , RTOffsetOf( Top_Actor, statusProt )
-        , 1
-        , 1
-        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+        , 0
+        , nullptr
     }
 };
-
-int Top_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_portId, int rtg_repIndex )
-{
-    switch( rtg_compId )
-    {
-    case 1:
-        switch( rtg_portId )
-        {
-        case 0:
-            if( rtg_repIndex < 1 )
-            {
-                rtg_end.port = &statusProt;
-                rtg_end.index = rtg_repIndex;
-                return 1;
-            }
-            break;
-        default:
-            break;
-        }
-        break;
-    default:
-        break;
-    }
-    return RTActor::_followOutV( rtg_end, rtg_compId, rtg_portId, rtg_repIndex );
-}
 
 #undef SUPER
 static RTActor * new_Top_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )

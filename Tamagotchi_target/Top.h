@@ -5,7 +5,6 @@
 #pragma interface "Top.h"
 #endif
 #include <UnitName.h>
-#include <StatusProt.h>
 #define SUPER RTActor
 class Top_Actor : public RTActor
 {
@@ -16,7 +15,6 @@ public:
     Top_Actor & operator=( Top_Actor & ) = delete;
 protected:
     RTActorRef status;
-    StatusProt::Conjugate statusProt;
     INLINE_METHODS void transition1_Initial( const void * rtdata, RTProtocol * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
@@ -28,9 +26,6 @@ protected:
     static const RTActor_class rtg_class;
 private:
     static const RTComponentDescriptor rtg_capsule_roles[];
-    static const RTPortDescriptor rtg_ports[];
-public:
-    virtual int _followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_portId, int rtg_repIndex ) override;
 };
 #undef SUPER
 extern const RTActorClass Top;

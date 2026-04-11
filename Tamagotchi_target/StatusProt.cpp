@@ -10,18 +10,13 @@ const RTProtocolDescriptor StatusProt::Base::rt_class =
     , &StatusProt::Conjugate::rt_class
     , "StatusProt"
     , 0
-    , 3
+    , 2
     , StatusProt::Base::rt_signals
 };
 
 const RTSignalDescriptor StatusProt::Base::rt_signals[] =
 {
     {
-        "hatch"
-        , &RTType_void
-        , StatusProt::Base::rti_hatch
-    }
-    , {
         "rtBound"
         , nullptr
         , StatusProt::Base::rti_rtBound
@@ -39,13 +34,23 @@ const RTProtocolDescriptor StatusProt::Conjugate::rt_class =
     , &StatusProt::Base::rt_class
     , "StatusProt"
     , 0
-    , 2
+    , 4
     , StatusProt::Conjugate::rt_signals
 };
 
 const RTSignalDescriptor StatusProt::Conjugate::rt_signals[] =
 {
     {
+        "hatch"
+        , &RTType_void
+        , StatusProt::Conjugate::rti_hatch
+    }
+    , {
+        "returnToIdle"
+        , &RTType_void
+        , StatusProt::Conjugate::rti_returnToIdle
+    }
+    , {
         "rtBound"
         , nullptr
         , StatusProt::Conjugate::rti_rtBound

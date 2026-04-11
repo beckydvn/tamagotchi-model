@@ -13,4 +13,27 @@ tc.createTargetProject = true;
 tc.targetConfiguration = 'WinT.x64-MinGw-12.2.0';
 tc.targetLocation = 'C:\\Users\\rebec\\eclipse-workspace\\tamagotchi-model\\';
 tc.targetProject = '/Tamagotchi_target';
+tc.threads = [
+{
+    name: 'MainThread',
+    implClass: 'RTPeerController',
+    stackSize: '20000',
+    priority: 'DEFAULT_MAIN_PRIORITY'
+},
+{
+    name: 'TimerThread',
+    implClass: 'RTTimerController',
+    stackSize: '20000',
+    priority: 'DEFAULT_TIMER_PRIORITY'
+},
+{
+    name: 'InputThread',
+    implClass: 'RTPeerController',
+    stackSize: '20000',
+    priority: 'DEFAULT_MAIN_PRIORITY',
+    logical: [
+        'InputLogical',
+    ]
+},
+];
 tc.topCapsule = 'platform:/resource/Tamagotchi/CPPModel.emx#_PcRTEDRfEfGs993j7RVgLQ';

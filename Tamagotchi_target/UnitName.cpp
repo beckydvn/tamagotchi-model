@@ -5,22 +5,32 @@
 
 extern const RTActorClass Top;
 
+RTController * InputLogical;
+
 #if USE_THREADS
+static RTController * InputThreadRTS;
+static RTThread * OTPhysThr_InputThread;
 static void _rtg_createThreads( RTDebugger * debugger )
 {
+    InputThreadRTS = new RTPeerController( debugger, "InputThread" );
+    OTPhysThr_InputThread = new RTThread( InputThreadRTS, 20000, DEFAULT_MAIN_PRIORITY );
 }
 
 static void _rtg_deleteThreads( void )
 {
+    delete OTPhysThr_InputThread;
+    delete InputThreadRTS;
 }
 
 static void _rtg_mapLogicalThreads( RTController * )
 {
+    InputLogical = InputThreadRTS;
 }
 
 #else 
 static void _rtg_mapLogicalThreads( RTController * controller )
 {
+    InputLogical = controller;
 }
 
 #endif

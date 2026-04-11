@@ -18,4 +18,5 @@
 #include <string.h>
 #include <ctype.h>
 //TC Common Preface End
+extern RTController * InputLogical;
 #endif /* UnitName_h */
