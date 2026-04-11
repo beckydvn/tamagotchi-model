@@ -17,10 +17,12 @@ public:
 protected:
     RTActorRef input;
     RTActorRef feed;
+    RTActorRef translateInput;
     Frame::Base frameP;
     Timing::Base timingPort;
     StatusProt::Base statusPort;
     std::string owner_name;
+public:
     std::string tama_name;
 private:
     int hunger { 5 } ;
@@ -37,7 +39,6 @@ protected:
     INLINE_METHODS void enter4_Inc_Hunger( void );
     INLINE_METHODS void enter5_Dec_Happiness( void );
     INLINE_METHODS void enter6_Dec_Discipline( void );
-    INLINE_METHODS void enter7_Return_To_Idle( void );
     INLINE_METHODS int guard3_50_chance( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS int guard4_30_chance( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS int guard5_20_chance( const void * rtdata, Timing::Base * rtport );
@@ -48,10 +49,9 @@ private:
     INLINE_CHAINS void chain4_30_chance( void );
     INLINE_CHAINS void chain5_20_chance( void );
     INLINE_CHAINS void chain6_timeout( void );
-    INLINE_CHAINS void chain7_timeout( void );
-    INLINE_CHAINS void chain8_timeout( void );
-    INLINE_CHAINS void chain9_timeout( void );
-    INLINE_CHAINS void chain10_timeout( void );
+    INLINE_CHAINS void chain7_timeout_10( void );
+    INLINE_CHAINS void chain8_timeout_10( void );
+    INLINE_CHAINS void chain9_timeout_10( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

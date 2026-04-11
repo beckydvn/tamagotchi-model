@@ -24,7 +24,7 @@ Feed_Actor::~Feed_Actor( void )
 INLINE_METHODS void Feed_Actor::enter3_Initialize_Feed( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_TM_2ADVMEfGJaL0kWrhu3A
-std::cout<< "\nFEED ACTIVATED" <<std::endl;
+std::cout<< "\nWHAT WOULD YOU LIKE TO FEED YOUR PET?" <<std::endl;
 //}}}USR
 }
 

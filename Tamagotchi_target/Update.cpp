@@ -4,10 +4,13 @@
 #include <UnitName.h>
 #include <Update.h>
 #include <FeedProt.h>
+#include <InputProt.h>
 
 extern const RTActorClass Feed;
 
 extern const RTActorClass Input;
+
+extern const RTActorClass TranslateInput;
 
 static const char * const rtg_state_names[] =
 {
@@ -17,8 +20,8 @@ static const char * const rtg_state_names[] =
     , "Inc Hunger"
     , "Dec Happiness"
     , "Dec Discipline"
-    , "Return To Idle"
     , "RNGVal"
+    , ""
 };
 
 static const RTInterfaceDescriptor rtg_interfaces_input[] =
@@ -28,7 +31,7 @@ static const RTInterfaceDescriptor rtg_interfaces_input[] =
         , 1
     }
     , {
-        "feedPort"
+        "inputPort"
         , 1
     }
 };
@@ -41,7 +44,7 @@ static const RTBindingDescriptor rtg_bindings_input[] =
     }
     , {
         1
-        , &FeedProt::Conjugate::rt_class
+        , &InputProt::Conjugate::rt_class
     }
 };
 
@@ -58,6 +61,30 @@ static const RTBindingDescriptor rtg_bindings_feed[] =
     {
         0
         , &FeedProt::Base::rt_class
+    }
+};
+
+static const RTInterfaceDescriptor rtg_interfaces_translateInput[] =
+{
+    {
+        "inputPort"
+        , 1
+    }
+    , {
+        "feedPort"
+        , 1
+    }
+};
+
+static const RTBindingDescriptor rtg_bindings_translateInput[] =
+{
+    {
+        0
+        , &InputProt::Base::rt_class
+    }
+    , {
+        1
+        , &FeedProt::Conjugate::rt_class
     }
 };
 
@@ -149,9 +176,6 @@ void Update_Actor::enterStateV( void )
     case 6:
         enter6_Dec_Discipline(  );
         break;
-    case 7:
-        enter7_Return_To_Idle(  );
-        break;
     default:
         RTActor::enterStateV(  );
         break;
@@ -161,12 +185,9 @@ void Update_Actor::enterStateV( void )
 INLINE_METHODS void Update_Actor::enter3_Idle( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#__QRG0DUUEfGPsvtei6AytQ
-std::cout<< "\nWHAT WOULD YOU LIKE TO DO NEXT?" <<std::endl;
-
 // here, we randomly generate the next event.
 // discipline, happiness, and hunger all change over time (the first two decrease, the latter increases).
 // every 5 seconds, we randomly pick one of the 3 to decrease/increase by 1 point.
-
 rng = (rand() % 100);
 timingPort.informIn(RTTimespec(5,0));
 //}}}USR
@@ -197,15 +218,6 @@ INLINE_METHODS void Update_Actor::enter6_Dec_Discipline( void )
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_8_H_EDUeEfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING ROWDY..." <<std::endl;
 discipline -= 1;
-timingPort.informIn(RTTimespec(0.2,0));
-
-//}}}USR
-}
-
-INLINE_METHODS void Update_Actor::enter7_Return_To_Idle( void )
-{
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_6tDGYDUsEfGJaL0kWrhu3A
-statusPort.returnToIdle().send();
 timingPort.informIn(RTTimespec(0.2,0));
 
 //}}}USR
@@ -265,7 +277,7 @@ INLINE_CHAINS void Update_Actor::chain2_timeout( void )
 
 INLINE_CHAINS void Update_Actor::chain3_50_chance( void )
 {
-    rtgChainBegin( 8, "50% chance" );
+    rtgChainBegin( 7, "50% chance" );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 4 );
@@ -273,7 +285,7 @@ INLINE_CHAINS void Update_Actor::chain3_50_chance( void )
 
 INLINE_CHAINS void Update_Actor::chain4_30_chance( void )
 {
-    rtgChainBegin( 8, "30% chance" );
+    rtgChainBegin( 7, "30% chance" );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 5 );
@@ -281,7 +293,7 @@ INLINE_CHAINS void Update_Actor::chain4_30_chance( void )
 
 INLINE_CHAINS void Update_Actor::chain5_20_chance( void )
 {
-    rtgChainBegin( 8, "20% chance" );
+    rtgChainBegin( 7, "20% chance" );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 6 );
@@ -289,44 +301,44 @@ INLINE_CHAINS void Update_Actor::chain5_20_chance( void )
 
 INLINE_CHAINS void Update_Actor::chain6_timeout( void )
 {
-    rtgChainBegin( 6, "timeout" );
-    exitState( rtg_parent_state );
-    rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    enterState( 7 );
-}
-
-INLINE_CHAINS void Update_Actor::chain7_timeout( void )
-{
-    rtgChainBegin( 5, "timeout" );
-    exitState( rtg_parent_state );
-    rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    enterState( 7 );
-}
-
-INLINE_CHAINS void Update_Actor::chain8_timeout( void )
-{
-    rtgChainBegin( 4, "timeout" );
-    exitState( rtg_parent_state );
-    rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    enterState( 7 );
-}
-
-INLINE_CHAINS void Update_Actor::chain9_timeout( void )
-{
-    rtgChainBegin( 7, "timeout" );
+    rtgChainBegin( 2, "timeout" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
 
-INLINE_CHAINS void Update_Actor::chain10_timeout( void )
+INLINE_CHAINS void Update_Actor::chain7_timeout_10( void )
 {
-    rtgChainBegin( 2, "timeout" );
+    rtgChainBegin( 6, "timeout" );
     exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    rtgChainBegin( 8, "return" );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Update_Actor::chain8_timeout_10( void )
+{
+    rtgChainBegin( 5, "timeout" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    rtgChainBegin( 8, "return" );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Update_Actor::chain9_timeout_10( void )
+{
+    rtgChainBegin( 4, "timeout" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    rtgChainBegin( 8, "return" );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 3 );
@@ -372,7 +384,7 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                     switch( signalIndex )
                     {
                     case Timing::Base::rti_timeout:
-                        chain10_timeout(  );
+                        chain6_timeout(  );
                         return ;
                     default:
                         break;
@@ -424,7 +436,7 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                     switch( signalIndex )
                     {
                     case Timing::Base::rti_timeout:
-                        chain8_timeout(  );
+                        chain9_timeout_10(  );
                         return ;
                     default:
                         break;
@@ -450,7 +462,7 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                     switch( signalIndex )
                     {
                     case Timing::Base::rti_timeout:
-                        chain7_timeout(  );
+                        chain8_timeout_10(  );
                         return ;
                     default:
                         break;
@@ -476,33 +488,7 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                     switch( signalIndex )
                     {
                     case Timing::Base::rti_timeout:
-                        chain6_timeout(  );
-                        return ;
-                    default:
-                        break;
-                    }
-                    break;
-                default:
-                    break;
-                }
-                break;
-            case 7 /* Return To Idle (State Machine::Return To Idle) */:
-                switch( portIndex )
-                {
-                case 0 /*RTControlPort*/:
-                    switch( signalIndex )
-                    {
-                    case 1 /*RTInitSignal*/:
-                        return ;
-                    default:
-                        break;
-                    }
-                    break;
-                case 2 /*timingPort*/:
-                    switch( signalIndex )
-                    {
-                    case Timing::Base::rti_timeout:
-                        chain9_timeout(  );
+                        chain7_timeout_10(  );
                         return ;
                     default:
                         break;
@@ -527,7 +513,6 @@ const RTStateId Update_Actor::rtg_parent_state[] =
     , 1
     , 1
     , 1
-    , 1
 };
 
 const RTActor_class * Update_Actor::getActorData( void ) const
@@ -539,10 +524,10 @@ const RTActor_class Update_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
-    , 7
+    , 6
     , Update_Actor::rtg_parent_state
     , &Update
-    , 2
+    , 3
     , Update_Actor::rtg_capsule_roles
     , 3
     , Update_Actor::rtg_ports
@@ -579,6 +564,19 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , rtg_interfaces_feed
         , 1
         , rtg_bindings_feed
+    }
+    , {
+        "translateInput"
+        , &TranslateInput
+        , RTOffsetOf( Update_Actor, translateInput )
+        , 3
+        , RTComponentDescriptor::Fixed
+        , 1
+        , 1
+        , 2
+        , rtg_interfaces_translateInput
+        , 2
+        , rtg_bindings_translateInput
     }
 };
 
@@ -664,7 +662,7 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
             break;
         case 1:
             if( rtg_repIndex < 1 )
-                return feed._followIn( rtg_end, 0, rtg_repIndex );
+                return translateInput._followIn( rtg_end, 0, rtg_repIndex );
             break;
         default:
             break;
@@ -675,7 +673,22 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
         {
         case 0:
             if( rtg_repIndex < 1 )
+                return translateInput._followIn( rtg_end, 1, rtg_repIndex );
+            break;
+        default:
+            break;
+        }
+        break;
+    case 3:
+        switch( rtg_portId )
+        {
+        case 0:
+            if( rtg_repIndex < 1 )
                 return input._followIn( rtg_end, 1, rtg_repIndex );
+            break;
+        case 1:
+            if( rtg_repIndex < 1 )
+                return feed._followIn( rtg_end, 0, rtg_repIndex );
             break;
         default:
             break;

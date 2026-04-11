@@ -1,51 +1,41 @@
 #if defined( PRAGMA ) && ! defined( PRAGMA_IMPLEMENTED )
-#pragma implementation "Input.h"
+#pragma implementation "TranslateInput.h"
 #endif
 #include <UnitName.h>
-#include <Input.h>
+#include <TranslateInput.h>
 
 static const char * const rtg_state_names[] =
 {
     "<machine>"
     , "Start"
-    , "Take Input"
+    , "SendSignals"
 };
 
 #define SUPER RTActor
-Input_Actor::Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+TranslateInput_Actor::TranslateInput_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
 {
 }
 
-Input_Actor::~Input_Actor( void )
+TranslateInput_Actor::~TranslateInput_Actor( void )
 {
 }
 
-INLINE_METHODS void Input_Actor::enter3_Take_Input( void )
+INLINE_METHODS void TranslateInput_Actor::enter3_SendSignals( void )
 {
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Z0mKADUpEfGJaL0kWrhu3A
-char userInput[256];
-
-while(true){
-	fgets(userInput, sizeof(userInput), stdin);
-
-	userInput[strcspn(userInput, "\n")] = '\0';
-
-	for (int i = 0; userInput[i]; i++) {
-			userInput[i] = toupper(userInput[i]);
-	}
-
-	inputPort.gotInput(userInput).send();
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_doD84DXfEfGJaL0kWrhu3A
+if(input == "FEED"){
+	feedPort.initFeed().send();
 }
 //}}}USR
 }
 
-void Input_Actor::enterStateV( void )
+void TranslateInput_Actor::enterStateV( void )
 {
     switch( getCurrentState() )
     {
     case 3:
-        enter3_Take_Input(  );
+        enter3_SendSignals(  );
         break;
     default:
         RTActor::enterStateV(  );
@@ -53,7 +43,23 @@ void Input_Actor::enterStateV( void )
     }
 }
 
-INLINE_CHAINS void Input_Actor::chain1_Initial( void )
+INLINE_METHODS void TranslateInput_Actor::transition2_gotInput( const void * rtdata, InputProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Kiq10DXeEfGJaL0kWrhu3A
+input = (const char *)rtdata;
+std::cout<< "TRANSLATE INPUT RECEIVED: " << input << std::endl;
+//}}}USR
+}
+
+INLINE_METHODS void TranslateInput_Actor::transition3_gotInput( const void * rtdata, InputProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Nd20kDXeEfGJaL0kWrhu3A
+input = (const char *)rtdata;
+std::cout<< "TRANSLATE INPUT RECEIVED: " << input << std::endl;
+//}}}USR
+}
+
+INLINE_CHAINS void TranslateInput_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
     rtgTransitionBegin(  );
@@ -61,16 +67,27 @@ INLINE_CHAINS void Input_Actor::chain1_Initial( void )
     enterState( 2 );
 }
 
-INLINE_CHAINS void Input_Actor::chain2_hatch( void )
+INLINE_CHAINS void TranslateInput_Actor::chain2_gotInput( void )
 {
-    rtgChainBegin( 2, "hatch" );
+    rtgChainBegin( 2, "gotInput" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
+    transition2_gotInput( msg->data, static_cast< InputProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
 
-void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
+INLINE_CHAINS void TranslateInput_Actor::chain3_gotInput( void )
+{
+    rtgChainBegin( 3, "gotInput" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition3_gotInput( msg->data, static_cast< InputProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+void TranslateInput_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
         {
@@ -106,11 +123,11 @@ void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 1 /*statusPort*/:
+                case 1 /*inputPort*/:
                     switch( signalIndex )
                     {
-                    case StatusProt::Conjugate::rti_hatch:
-                        chain2_hatch(  );
+                    case InputProt::Conjugate::rti_gotInput:
+                        chain2_gotInput(  );
                         return ;
                     default:
                         break;
@@ -120,13 +137,23 @@ void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
                     break;
                 }
                 break;
-            case 3 /* Take Input (State Machine::Take Input) */:
+            case 3 /* SendSignals (State Machine::SendSignals) */:
                 switch( portIndex )
                 {
                 case 0 /*RTControlPort*/:
                     switch( signalIndex )
                     {
                     case 1 /*RTInitSignal*/:
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 1 /*inputPort*/:
+                    switch( signalIndex )
+                    {
+                    case InputProt::Conjugate::rti_gotInput:
+                        chain3_gotInput(  );
                         return ;
                     default:
                         break;
@@ -143,65 +170,65 @@ void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
         }
 }
 
-const RTStateId Input_Actor::rtg_parent_state[] =
+const RTStateId TranslateInput_Actor::rtg_parent_state[] =
 {
     0
     , 1
     , 1
 };
 
-const RTActor_class * Input_Actor::getActorData( void ) const
+const RTActor_class * TranslateInput_Actor::getActorData( void ) const
 {
-    return &Input_Actor::rtg_class;
+    return &TranslateInput_Actor::rtg_class;
 }
 
-const RTActor_class Input_Actor::rtg_class =
+const RTActor_class TranslateInput_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
     , 3
-    , Input_Actor::rtg_parent_state
-    , &Input
+    , TranslateInput_Actor::rtg_parent_state
+    , &TranslateInput
     , 0
     , nullptr
     , 2
-    , Input_Actor::rtg_ports
+    , TranslateInput_Actor::rtg_ports
     , 0
     , nullptr
     , 0
     , nullptr
 };
 
-const RTPortDescriptor Input_Actor::rtg_ports[] =
+const RTPortDescriptor TranslateInput_Actor::rtg_ports[] =
 {
     {
-        "statusPort"
+        "inputPort"
         , nullptr
-        , &StatusProt::Conjugate::rt_class
-        , RTOffsetOf( Input_Actor, statusPort )
+        , &InputProt::Conjugate::rt_class
+        , RTOffsetOf( TranslateInput_Actor, inputPort )
         , 1
         , 1
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
     , {
-        "inputPort"
+        "feedPort"
         , nullptr
-        , &InputProt::Base::rt_class
-        , RTOffsetOf( Input_Actor, inputPort )
+        , &FeedProt::Base::rt_class
+        , RTOffsetOf( TranslateInput_Actor, feedPort )
         , 1
         , 2
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
 
-int Input_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
+int TranslateInput_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
 {
     switch( rtg_portId )
     {
     case 0:
         if( rtg_repIndex < 1 )
         {
-            rtg_end.port = &statusPort;
+            rtg_end.port = &inputPort;
             rtg_end.index = rtg_repIndex;
             return 1;
         }
@@ -209,7 +236,7 @@ int Input_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_rep
     case 1:
         if( rtg_repIndex < 1 )
         {
-            rtg_end.port = &inputPort;
+            rtg_end.port = &feedPort;
             rtg_end.index = rtg_repIndex;
             return 1;
         }
@@ -224,29 +251,29 @@ int Input_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_rep
 static const RTRelayDescriptor rtg_relays[] =
 {
     {
-        "statusPort"
-        , &StatusProt::Conjugate::rt_class
+        "inputPort"
+        , &InputProt::Conjugate::rt_class
         , 1
     }
     , {
-        "inputPort"
-        , &InputProt::Base::rt_class
+        "feedPort"
+        , &FeedProt::Base::rt_class
         , 1
     }
 };
 
-static RTActor * new_Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+static RTActor * new_TranslateInput_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
 {
-    return new Input_Actor( rtg_rts, rtg_ref );
+    return new TranslateInput_Actor( rtg_rts, rtg_ref );
 }
 
-const RTActorClass Input =
+const RTActorClass TranslateInput =
 {
     nullptr
-    , "Input"
+    , "TranslateInput"
     , 0 /*RTVersionId*/
     , 2
     , rtg_relays
-    , new_Input_Actor
+    , new_TranslateInput_Actor
 };
 

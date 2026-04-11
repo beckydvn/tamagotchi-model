@@ -23,7 +23,9 @@
 	Feed$(OBJ_EXT)\
 	FeedProt$(OBJ_EXT)\
 	Input$(OBJ_EXT)\
+	InputProt$(OBJ_EXT)\
 	StatusProt$(OBJ_EXT)\
+	TranslateInput$(OBJ_EXT)\
 	UnitName$(OBJ_EXT)\
 	Update$(OBJ_EXT)
 0_OBJS_LIST = $(0_OBJS)
@@ -32,7 +34,9 @@
 	Feed$(DEP_EXT)\
 	FeedProt$(DEP_EXT)\
 	Input$(DEP_EXT)\
+	InputProt$(DEP_EXT)\
 	StatusProt$(DEP_EXT)\
+	TranslateInput$(DEP_EXT)\
 	UnitName$(DEP_EXT)\
 	Update$(DEP_EXT)
 
@@ -98,29 +102,37 @@ FeedProt$(OBJ_EXT) : ../FeedProt.cpp ../UnitName.h ../FeedProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:FeedProt
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../FeedProt.cpp $(CC_TAIL)
 
-Input$(OBJ_EXT) : ../Input.cpp ../UnitName.h ../Input.h ../FeedProt.h ../StatusProt.h .cc.dat
+Input$(OBJ_EXT) : ../Input.cpp ../UnitName.h ../Input.h ../InputProt.h ../StatusProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:Input
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Input.cpp $(CC_TAIL)
+
+InputProt$(OBJ_EXT) : ../InputProt.cpp ../UnitName.h ../InputProt.h .cc.dat
+	@$(FEEDBACK) Compiling Tamagotchi_target:InputProt
+	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../InputProt.cpp $(CC_TAIL)
 
 StatusProt$(OBJ_EXT) : ../StatusProt.cpp ../UnitName.h ../StatusProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:StatusProt
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../StatusProt.cpp $(CC_TAIL)
 
+TranslateInput$(OBJ_EXT) : ../TranslateInput.cpp ../UnitName.h ../TranslateInput.h ../FeedProt.h ../InputProt.h .cc.dat
+	@$(FEEDBACK) Compiling Tamagotchi_target:TranslateInput
+	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../TranslateInput.cpp $(CC_TAIL)
+
 UnitName$(OBJ_EXT) : ../UnitName.cpp ../UnitName.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:UnitName
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../UnitName.cpp $(CC_TAIL)
 
-Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../StatusProt.h ../FeedProt.h .cc.dat
+Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../StatusProt.h ../FeedProt.h ../InputProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:Update
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Update.cpp $(CC_TAIL)
 
 0_clean :
 	@$(ECHO) Cleaning Tamagotchi_target
 	$(RMF) executable$(EXEC_EXT)
-	$(RMF) Feed$(OBJ_EXT) FeedProt$(OBJ_EXT) Input$(OBJ_EXT) StatusProt$(OBJ_EXT) UnitName$(OBJ_EXT)
-	$(RMF) Update$(OBJ_EXT)
-	$(RMF) Feed$(DEP_EXT) FeedProt$(DEP_EXT) Input$(DEP_EXT) StatusProt$(DEP_EXT) UnitName$(DEP_EXT)
-	$(RMF) Update$(DEP_EXT)
+	$(RMF) Feed$(OBJ_EXT) FeedProt$(OBJ_EXT) Input$(OBJ_EXT) InputProt$(OBJ_EXT) StatusProt$(OBJ_EXT)
+	$(RMF) TranslateInput$(OBJ_EXT) UnitName$(OBJ_EXT) Update$(OBJ_EXT)
+	$(RMF) Feed$(DEP_EXT) FeedProt$(DEP_EXT) Input$(DEP_EXT) InputProt$(DEP_EXT) StatusProt$(DEP_EXT)
+	$(RMF) TranslateInput$(DEP_EXT) UnitName$(DEP_EXT) Update$(DEP_EXT)
 	$(RMF) $(PURECOV_TARGET)
 	$(RMF) $(PURIFY_TARGET)
 	$(RMF) $(PURIFY_COV_TARGET)

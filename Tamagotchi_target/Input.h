@@ -5,7 +5,7 @@
 #pragma interface "Input.h"
 #endif
 #include <UnitName.h>
-#include <FeedProt.h>
+#include <InputProt.h>
 #include <StatusProt.h>
 #define SUPER RTActor
 class Input_Actor : public RTActor
@@ -17,16 +17,12 @@ public:
     Input_Actor & operator=( Input_Actor & ) = delete;
 protected:
     StatusProt::Conjugate statusPort;
-    FeedProt::Base feedPort;
-private:
-    std::string input;
-protected:
+    InputProt::Base inputPort;
     INLINE_METHODS void enter3_Take_Input( void );
     virtual void enterStateV( void ) override;
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_hatch( void );
-    INLINE_CHAINS void chain3_returnToIdle( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];
