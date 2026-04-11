@@ -968,4 +968,5 @@ std::cout&lt;&lt; &quot;\nGOT INPUT &quot; &lt;&lt; input &lt;&lt;std::endl;</bo
   <UMLRealTime:CapsulePart xmi:id="_tAMT0DU3EfGJaL0kWrhu3A" base_Property="_tALFsDU3EfGJaL0kWrhu3A"/>
   <UMLRealTime:RTPort xmi:id="_EV3SYDU7EfGJaL0kWrhu3A" base_Port="_EV1dMDU7EfGJaL0kWrhu3A"/>
   <UMLRealTime:RTConnector xmi:id="_bWA0QDU7EfGJaL0kWrhu3A" base_Connector="_bV-_EDU7EfGJaL0kWrhu3A"/>
+  <CppPropertySets:TargetRTSAttributeProperties xmi:id="_NaPVkDU-EfGJaL0kWrhu3A" base_Property="_wHWvgDUrEfGJaL0kWrhu3A" generateDescriptor="false"/>
 </xmi:XMI>
