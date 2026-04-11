@@ -36,4 +36,4 @@ tc.threads = [
     ]
 },
 ];
-tc.topCapsule = 'platform:/resource/Tamagotchi/CPPModel.emx#_PcRTEDRfEfGs993j7RVgLQ';
+tc.topCapsule = 'platform:/resource/Tamagotchi/CPPModel.emx#_hFyugDRfEfGs993j7RVgLQ';

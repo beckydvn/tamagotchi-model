@@ -1,24 +1,25 @@
-#ifndef MainGame_h
-#define MainGame_h
+#ifndef Update_h
+#define Update_h
 
 #ifdef PRAGMA
-#pragma interface "MainGame.h"
+#pragma interface "Update.h"
 #endif
 #include <UnitName.h>
 #include <StatusProt.h>
 #define SUPER RTActor
-class MainGame_Actor : public RTActor
+class Update_Actor : public RTActor
 {
 public:
-    MainGame_Actor( RTController * rtg_rts, RTActorRef * rtg_ref );
-    virtual ~MainGame_Actor( void );
-    MainGame_Actor( const MainGame_Actor & ) = delete;
-    MainGame_Actor & operator=( MainGame_Actor & ) = delete;
+    Update_Actor( RTController * rtg_rts, RTActorRef * rtg_ref );
+    virtual ~Update_Actor( void );
+    Update_Actor( const Update_Actor & ) = delete;
+    Update_Actor & operator=( Update_Actor & ) = delete;
 protected:
     RTActorRef input;
+    RTActorRef feed;
     Frame::Base frameP;
     Timing::Base timingPort;
-    StatusProt::Base statusProt;
+    StatusProt::Base statusPort;
     std::string owner_name;
     std::string tama_name;
 private:
@@ -61,9 +62,9 @@ private:
     static const RTComponentDescriptor rtg_capsule_roles[];
     static const RTPortDescriptor rtg_ports[];
 public:
-    static const RTFieldDescriptor rtg_MainGame_Actor_fields[];
+    static const RTFieldDescriptor rtg_Update_Actor_fields[];
     virtual int _followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_portId, int rtg_repIndex ) override;
 };
 #undef SUPER
-extern const RTActorClass MainGame;
-#endif /* MainGame_h */
+extern const RTActorClass Update;
+#endif /* Update_h */

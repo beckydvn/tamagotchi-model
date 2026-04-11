@@ -1,49 +1,39 @@
 #if defined( PRAGMA ) && ! defined( PRAGMA_IMPLEMENTED )
-#pragma implementation "Input.h"
+#pragma implementation "Feed.h"
 #endif
 #include <UnitName.h>
-#include <Input.h>
+#include <Feed.h>
 
 static const char * const rtg_state_names[] =
 {
     "<machine>"
     , "Start"
-    , "Take Input"
+    , "Initialize Feed"
 };
 
 #define SUPER RTActor
-Input_Actor::Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+Feed_Actor::Feed_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
 {
 }
 
-Input_Actor::~Input_Actor( void )
+Feed_Actor::~Feed_Actor( void )
 {
 }
 
-INLINE_METHODS void Input_Actor::enter3_Take_Input( void )
+INLINE_METHODS void Feed_Actor::enter3_Initialize_Feed( void )
 {
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Z0mKADUpEfGJaL0kWrhu3A
-char userInput[256];
-
-fgets(userInput, sizeof(userInput), stdin);
-
-char userInputInitial = toupper(userInput[0]);
-
-input = userInputInitial;
-
-std::cout<< "\nGOT INPUT " << userInputInitial <<std::endl;
-
-feedPort.initFeed().send();
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_TM_2ADVMEfGJaL0kWrhu3A
+std::cout<< "\nFEED ACTIVATED" <<std::endl;
 //}}}USR
 }
 
-void Input_Actor::enterStateV( void )
+void Feed_Actor::enterStateV( void )
 {
     switch( getCurrentState() )
     {
     case 3:
-        enter3_Take_Input(  );
+        enter3_Initialize_Feed(  );
         break;
     default:
         RTActor::enterStateV(  );
@@ -51,7 +41,7 @@ void Input_Actor::enterStateV( void )
     }
 }
 
-INLINE_CHAINS void Input_Actor::chain1_Initial( void )
+INLINE_CHAINS void Feed_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
     rtgTransitionBegin(  );
@@ -59,25 +49,16 @@ INLINE_CHAINS void Input_Actor::chain1_Initial( void )
     enterState( 2 );
 }
 
-INLINE_CHAINS void Input_Actor::chain2_hatch( void )
+INLINE_CHAINS void Feed_Actor::chain2_feed_activated( void )
 {
-    rtgChainBegin( 2, "hatch" );
+    rtgChainBegin( 2, "feed activated" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
 
-INLINE_CHAINS void Input_Actor::chain3_returnToIdle( void )
-{
-    rtgChainBegin( 3, "returnToIdle" );
-    exitState( rtg_parent_state );
-    rtgTransitionBegin(  );
-    rtgTransitionEnd(  );
-    enterState( 3 );
-}
-
-void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
+void Feed_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
         {
@@ -113,11 +94,11 @@ void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 1 /*statusPort*/:
+                case 1 /*feedPort*/:
                     switch( signalIndex )
                     {
-                    case StatusProt::Conjugate::rti_hatch:
-                        chain2_hatch(  );
+                    case FeedProt::Conjugate::rti_initFeed:
+                        chain2_feed_activated(  );
                         return ;
                     default:
                         break;
@@ -127,23 +108,13 @@ void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
                     break;
                 }
                 break;
-            case 3 /* Take Input (State Machine::Take Input) */:
+            case 3 /* Initialize Feed (State Machine::Initialize Feed) */:
                 switch( portIndex )
                 {
                 case 0 /*RTControlPort*/:
                     switch( signalIndex )
                     {
                     case 1 /*RTInitSignal*/:
-                        return ;
-                    default:
-                        break;
-                    }
-                    break;
-                case 1 /*statusPort*/:
-                    switch( signalIndex )
-                    {
-                    case StatusProt::Conjugate::rti_returnToIdle:
-                        chain3_returnToIdle(  );
                         return ;
                     default:
                         break;
@@ -160,70 +131,53 @@ void Input_Actor::rtsBehavior( int signalIndex, int portIndex )
         }
 }
 
-const RTStateId Input_Actor::rtg_parent_state[] =
+const RTStateId Feed_Actor::rtg_parent_state[] =
 {
     0
     , 1
     , 1
 };
 
-const RTActor_class * Input_Actor::getActorData( void ) const
+const RTActor_class * Feed_Actor::getActorData( void ) const
 {
-    return &Input_Actor::rtg_class;
+    return &Feed_Actor::rtg_class;
 }
 
-const RTActor_class Input_Actor::rtg_class =
+const RTActor_class Feed_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
     , 3
-    , Input_Actor::rtg_parent_state
-    , &Input
+    , Feed_Actor::rtg_parent_state
+    , &Feed
     , 0
     , nullptr
-    , 2
-    , Input_Actor::rtg_ports
+    , 1
+    , Feed_Actor::rtg_ports
     , 0
     , nullptr
     , 0
     , nullptr
 };
 
-const RTPortDescriptor Input_Actor::rtg_ports[] =
+const RTPortDescriptor Feed_Actor::rtg_ports[] =
 {
     {
-        "statusPort"
-        , nullptr
-        , &StatusProt::Conjugate::rt_class
-        , RTOffsetOf( Input_Actor, statusPort )
-        , 1
-        , 1
-        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
-    }
-    , {
         "feedPort"
         , nullptr
-        , &FeedProt::Base::rt_class
-        , RTOffsetOf( Input_Actor, feedPort )
+        , &FeedProt::Conjugate::rt_class
+        , RTOffsetOf( Feed_Actor, feedPort )
         , 1
-        , 2
+        , 1
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
 
-int Input_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
+int Feed_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
 {
     switch( rtg_portId )
     {
     case 0:
-        if( rtg_repIndex < 1 )
-        {
-            rtg_end.port = &statusPort;
-            rtg_end.index = rtg_repIndex;
-            return 1;
-        }
-        break;
-    case 1:
         if( rtg_repIndex < 1 )
         {
             rtg_end.port = &feedPort;
@@ -241,29 +195,24 @@ int Input_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_rep
 static const RTRelayDescriptor rtg_relays[] =
 {
     {
-        "statusPort"
-        , &StatusProt::Conjugate::rt_class
-        , 1
-    }
-    , {
         "feedPort"
-        , &FeedProt::Base::rt_class
+        , &FeedProt::Conjugate::rt_class
         , 1
     }
 };
 
-static RTActor * new_Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+static RTActor * new_Feed_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
 {
-    return new Input_Actor( rtg_rts, rtg_ref );
+    return new Feed_Actor( rtg_rts, rtg_ref );
 }
 
-const RTActorClass Input =
+const RTActorClass Feed =
 {
     nullptr
-    , "Input"
+    , "Feed"
     , 0 /*RTVersionId*/
-    , 2
+    , 1
     , rtg_relays
-    , new_Input_Actor
+    , new_Feed_Actor
 };
 

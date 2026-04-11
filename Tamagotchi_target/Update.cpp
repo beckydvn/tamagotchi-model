@@ -1,8 +1,11 @@
 #if defined( PRAGMA ) && ! defined( PRAGMA_IMPLEMENTED )
-#pragma implementation "MainGame.h"
+#pragma implementation "Update.h"
 #endif
 #include <UnitName.h>
-#include <MainGame.h>
+#include <Update.h>
+#include <FeedProt.h>
+
+extern const RTActorClass Feed;
 
 extern const RTActorClass Input;
 
@@ -21,7 +24,11 @@ static const char * const rtg_state_names[] =
 static const RTInterfaceDescriptor rtg_interfaces_input[] =
 {
     {
-        "statusProt"
+        "statusPort"
+        , 1
+    }
+    , {
+        "feedPort"
         , 1
     }
 };
@@ -32,19 +39,39 @@ static const RTBindingDescriptor rtg_bindings_input[] =
         0
         , &StatusProt::Base::rt_class
     }
+    , {
+        1
+        , &FeedProt::Conjugate::rt_class
+    }
+};
+
+static const RTInterfaceDescriptor rtg_interfaces_feed[] =
+{
+    {
+        "feedPort"
+        , 1
+    }
+};
+
+static const RTBindingDescriptor rtg_bindings_feed[] =
+{
+    {
+        0
+        , &FeedProt::Base::rt_class
+    }
 };
 
 #define SUPER RTActor
-MainGame_Actor::MainGame_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+Update_Actor::Update_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
 {
 }
 
-MainGame_Actor::~MainGame_Actor( void )
+Update_Actor::~Update_Actor( void )
 {
 }
 
-void MainGame_Actor::showStatus( void )
+void Update_Actor::showStatus( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_mW9aQDRsEfGs993j7RVgLQ
 std::cout<< "\n-----------------------------------------------------------------------" <<std::endl;
@@ -53,7 +80,7 @@ std::cout<< "-------------------------------------------------------------------
 //}}}USR
 }
 
-INLINE_METHODS void MainGame_Actor::enter2_Hatch( void )
+INLINE_METHODS void Update_Actor::enter2_Hatch( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_NnvBADUoEfGJaL0kWrhu3A
 std::cout << "[Status] incarnating 'input' on logical thread 'InputLogical'" << std::endl;
@@ -98,12 +125,12 @@ std::cout<< "\n" << tname << " LOOKS HAPPY TO MEET YOU, " << owner_name << "!" <
 
 std::cout<< "\nINITIALIZING STATS..." <<std::endl;
 
-statusProt.hatch().send();
+statusPort.hatch().send();
 timingPort.informIn(RTTimespec(0.5,0));
 //}}}USR
 }
 
-void MainGame_Actor::enterStateV( void )
+void Update_Actor::enterStateV( void )
 {
     switch( getCurrentState() )
     {
@@ -131,7 +158,7 @@ void MainGame_Actor::enterStateV( void )
     }
 }
 
-INLINE_METHODS void MainGame_Actor::enter3_Idle( void )
+INLINE_METHODS void Update_Actor::enter3_Idle( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#__QRG0DUUEfGPsvtei6AytQ
 std::cout<< "\nWHAT WOULD YOU LIKE TO DO NEXT?" <<std::endl;
@@ -145,7 +172,7 @@ timingPort.informIn(RTTimespec(5,0));
 //}}}USR
 }
 
-INLINE_METHODS void MainGame_Actor::enter4_Inc_Hunger( void )
+INLINE_METHODS void Update_Actor::enter4_Inc_Hunger( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_LWNdkDUYEfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING HUNGRY..." <<std::endl;
@@ -155,7 +182,7 @@ timingPort.informIn(RTTimespec(0.2,0));
 //}}}USR
 }
 
-INLINE_METHODS void MainGame_Actor::enter5_Dec_Happiness( void )
+INLINE_METHODS void Update_Actor::enter5_Dec_Happiness( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_IrkNgDUeEfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING BORED..." <<std::endl;
@@ -165,7 +192,7 @@ timingPort.informIn(RTTimespec(0.2,0));
 //}}}USR
 }
 
-INLINE_METHODS void MainGame_Actor::enter6_Dec_Discipline( void )
+INLINE_METHODS void Update_Actor::enter6_Dec_Discipline( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_8_H_EDUeEfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING ROWDY..." <<std::endl;
@@ -175,37 +202,37 @@ timingPort.informIn(RTTimespec(0.2,0));
 //}}}USR
 }
 
-INLINE_METHODS void MainGame_Actor::enter7_Return_To_Idle( void )
+INLINE_METHODS void Update_Actor::enter7_Return_To_Idle( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_6tDGYDUsEfGJaL0kWrhu3A
-statusProt.returnToIdle().send();
+statusPort.returnToIdle().send();
 timingPort.informIn(RTTimespec(0.2,0));
 
 //}}}USR
 }
 
-INLINE_METHODS int MainGame_Actor::guard3_50_chance( const void * rtdata, Timing::Base * rtport )
+INLINE_METHODS int Update_Actor::guard3_50_chance( const void * rtdata, Timing::Base * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_QnuoQDUdEfGJaL0kWrhu3A
 return (rng <= 50);
 //}}}USR
 }
 
-INLINE_METHODS int MainGame_Actor::guard4_30_chance( const void * rtdata, Timing::Base * rtport )
+INLINE_METHODS int Update_Actor::guard4_30_chance( const void * rtdata, Timing::Base * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_UKgWADUeEfGJaL0kWrhu3A
 return (rng > 50 && rng <= 80);
 //}}}USR
 }
 
-INLINE_METHODS int MainGame_Actor::guard5_20_chance( const void * rtdata, Timing::Base * rtport )
+INLINE_METHODS int Update_Actor::guard5_20_chance( const void * rtdata, Timing::Base * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_y1jHADUeEfGJaL0kWrhu3A
 return (rng > 80 && rng <= 100);
 //}}}USR
 }
 
-INLINE_CHAINS void MainGame_Actor::chain1_Initial( void )
+INLINE_CHAINS void Update_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
     rtgTransitionBegin(  );
@@ -213,7 +240,7 @@ INLINE_CHAINS void MainGame_Actor::chain1_Initial( void )
     enterState( 2 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain2_timeout( void )
+INLINE_CHAINS void Update_Actor::chain2_timeout( void )
 {
     rtgChainBegin( 3, "timeout" );
     exitState( rtg_parent_state );
@@ -236,7 +263,7 @@ INLINE_CHAINS void MainGame_Actor::chain2_timeout( void )
     }
 }
 
-INLINE_CHAINS void MainGame_Actor::chain3_50_chance( void )
+INLINE_CHAINS void Update_Actor::chain3_50_chance( void )
 {
     rtgChainBegin( 8, "50% chance" );
     rtgTransitionBegin(  );
@@ -244,7 +271,7 @@ INLINE_CHAINS void MainGame_Actor::chain3_50_chance( void )
     enterState( 4 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain4_30_chance( void )
+INLINE_CHAINS void Update_Actor::chain4_30_chance( void )
 {
     rtgChainBegin( 8, "30% chance" );
     rtgTransitionBegin(  );
@@ -252,7 +279,7 @@ INLINE_CHAINS void MainGame_Actor::chain4_30_chance( void )
     enterState( 5 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain5_20_chance( void )
+INLINE_CHAINS void Update_Actor::chain5_20_chance( void )
 {
     rtgChainBegin( 8, "20% chance" );
     rtgTransitionBegin(  );
@@ -260,7 +287,7 @@ INLINE_CHAINS void MainGame_Actor::chain5_20_chance( void )
     enterState( 6 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain6_timeout( void )
+INLINE_CHAINS void Update_Actor::chain6_timeout( void )
 {
     rtgChainBegin( 6, "timeout" );
     exitState( rtg_parent_state );
@@ -269,7 +296,7 @@ INLINE_CHAINS void MainGame_Actor::chain6_timeout( void )
     enterState( 7 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain7_timeout( void )
+INLINE_CHAINS void Update_Actor::chain7_timeout( void )
 {
     rtgChainBegin( 5, "timeout" );
     exitState( rtg_parent_state );
@@ -278,7 +305,7 @@ INLINE_CHAINS void MainGame_Actor::chain7_timeout( void )
     enterState( 7 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain8_timeout( void )
+INLINE_CHAINS void Update_Actor::chain8_timeout( void )
 {
     rtgChainBegin( 4, "timeout" );
     exitState( rtg_parent_state );
@@ -287,7 +314,7 @@ INLINE_CHAINS void MainGame_Actor::chain8_timeout( void )
     enterState( 7 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain9_timeout( void )
+INLINE_CHAINS void Update_Actor::chain9_timeout( void )
 {
     rtgChainBegin( 7, "timeout" );
     exitState( rtg_parent_state );
@@ -296,7 +323,7 @@ INLINE_CHAINS void MainGame_Actor::chain9_timeout( void )
     enterState( 3 );
 }
 
-INLINE_CHAINS void MainGame_Actor::chain10_timeout( void )
+INLINE_CHAINS void Update_Actor::chain10_timeout( void )
 {
     rtgChainBegin( 2, "timeout" );
     exitState( rtg_parent_state );
@@ -305,7 +332,7 @@ INLINE_CHAINS void MainGame_Actor::chain10_timeout( void )
     enterState( 3 );
 }
 
-void MainGame_Actor::rtsBehavior( int signalIndex, int portIndex )
+void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
         {
@@ -492,7 +519,7 @@ void MainGame_Actor::rtsBehavior( int signalIndex, int portIndex )
         }
 }
 
-const RTStateId MainGame_Actor::rtg_parent_state[] =
+const RTStateId Update_Actor::rtg_parent_state[] =
 {
     0
     , 1
@@ -503,52 +530,65 @@ const RTStateId MainGame_Actor::rtg_parent_state[] =
     , 1
 };
 
-const RTActor_class * MainGame_Actor::getActorData( void ) const
+const RTActor_class * Update_Actor::getActorData( void ) const
 {
-    return &MainGame_Actor::rtg_class;
+    return &Update_Actor::rtg_class;
 }
 
-const RTActor_class MainGame_Actor::rtg_class =
+const RTActor_class Update_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
     , 7
-    , MainGame_Actor::rtg_parent_state
-    , &MainGame
-    , 1
-    , MainGame_Actor::rtg_capsule_roles
+    , Update_Actor::rtg_parent_state
+    , &Update
+    , 2
+    , Update_Actor::rtg_capsule_roles
     , 3
-    , MainGame_Actor::rtg_ports
+    , Update_Actor::rtg_ports
     , 0
     , nullptr
     , 5
-    , MainGame_Actor::rtg_MainGame_Actor_fields
+    , Update_Actor::rtg_Update_Actor_fields
 };
 
-const RTComponentDescriptor MainGame_Actor::rtg_capsule_roles[] =
+const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
 {
     {
         "input"
         , &Input
-        , RTOffsetOf( MainGame_Actor, input )
+        , RTOffsetOf( Update_Actor, input )
         , 1
         , RTComponentDescriptor::Optional
         , 1
         , 1
-        , 1
+        , 2
         , rtg_interfaces_input
-        , 1
+        , 2
         , rtg_bindings_input
+    }
+    , {
+        "feed"
+        , &Feed
+        , RTOffsetOf( Update_Actor, feed )
+        , 2
+        , RTComponentDescriptor::Fixed
+        , 1
+        , 1
+        , 1
+        , rtg_interfaces_feed
+        , 1
+        , rtg_bindings_feed
     }
 };
 
-const RTPortDescriptor MainGame_Actor::rtg_ports[] =
+const RTPortDescriptor Update_Actor::rtg_ports[] =
 {
     {
         "frameP"
         , nullptr
         , &Frame::Base::rt_class
-        , RTOffsetOf( MainGame_Actor, frameP )
+        , RTOffsetOf( Update_Actor, frameP )
         , 1
         , 1
         , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
@@ -557,57 +597,57 @@ const RTPortDescriptor MainGame_Actor::rtg_ports[] =
         "timingPort"
         , nullptr
         , &Timing::Base::rt_class
-        , RTOffsetOf( MainGame_Actor, timingPort )
+        , RTOffsetOf( Update_Actor, timingPort )
         , 1
         , 2
         , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
     , {
-        "statusProt"
+        "statusPort"
         , nullptr
         , &StatusProt::Base::rt_class
-        , RTOffsetOf( MainGame_Actor, statusProt )
+        , RTOffsetOf( Update_Actor, statusPort )
         , 1
         , 3
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
 
-const RTFieldDescriptor MainGame_Actor::rtg_MainGame_Actor_fields[] =
+const RTFieldDescriptor Update_Actor::rtg_Update_Actor_fields[] =
 {
     {
         "hunger"
-        , RTOffsetOf( MainGame_Actor, hunger )
+        , RTOffsetOf( Update_Actor, hunger )
         , &RTType_int
         , nullptr
     }
     , {
         "discipline"
-        , RTOffsetOf( MainGame_Actor, discipline )
+        , RTOffsetOf( Update_Actor, discipline )
         , &RTType_int
         , nullptr
     }
     , {
         "happiness"
-        , RTOffsetOf( MainGame_Actor, happiness )
+        , RTOffsetOf( Update_Actor, happiness )
         , &RTType_int
         , nullptr
     }
     , {
         "health"
-        , RTOffsetOf( MainGame_Actor, health )
+        , RTOffsetOf( Update_Actor, health )
         , &RTType_int
         , nullptr
     }
     , {
         "rng"
-        , RTOffsetOf( MainGame_Actor, rng )
+        , RTOffsetOf( Update_Actor, rng )
         , &RTType_int
         , nullptr
     }
 };
 
-int MainGame_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_portId, int rtg_repIndex )
+int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_portId, int rtg_repIndex )
 {
     switch( rtg_compId )
     {
@@ -617,10 +657,25 @@ int MainGame_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg
         case 0:
             if( rtg_repIndex < 1 )
             {
-                rtg_end.port = &statusProt;
+                rtg_end.port = &statusPort;
                 rtg_end.index = rtg_repIndex;
                 return 1;
             }
+            break;
+        case 1:
+            if( rtg_repIndex < 1 )
+                return feed._followIn( rtg_end, 0, rtg_repIndex );
+            break;
+        default:
+            break;
+        }
+        break;
+    case 2:
+        switch( rtg_portId )
+        {
+        case 0:
+            if( rtg_repIndex < 1 )
+                return input._followIn( rtg_end, 1, rtg_repIndex );
             break;
         default:
             break;
@@ -633,18 +688,18 @@ int MainGame_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg
 }
 
 #undef SUPER
-static RTActor * new_MainGame_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+static RTActor * new_Update_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
 {
-    return new MainGame_Actor( rtg_rts, rtg_ref );
+    return new Update_Actor( rtg_rts, rtg_ref );
 }
 
-const RTActorClass MainGame =
+const RTActorClass Update =
 {
     nullptr
-    , "MainGame"
+    , "Update"
     , 0 /*RTVersionId*/
     , 0
     , nullptr
-    , new_MainGame_Actor
+    , new_Update_Actor
 };
 

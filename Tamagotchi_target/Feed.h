@@ -1,32 +1,26 @@
-#ifndef Input_h
-#define Input_h
+#ifndef Feed_h
+#define Feed_h
 
 #ifdef PRAGMA
-#pragma interface "Input.h"
+#pragma interface "Feed.h"
 #endif
 #include <UnitName.h>
 #include <FeedProt.h>
-#include <StatusProt.h>
 #define SUPER RTActor
-class Input_Actor : public RTActor
+class Feed_Actor : public RTActor
 {
 public:
-    Input_Actor( RTController * rtg_rts, RTActorRef * rtg_ref );
-    virtual ~Input_Actor( void );
-    Input_Actor( const Input_Actor & ) = delete;
-    Input_Actor & operator=( Input_Actor & ) = delete;
+    Feed_Actor( RTController * rtg_rts, RTActorRef * rtg_ref );
+    virtual ~Feed_Actor( void );
+    Feed_Actor( const Feed_Actor & ) = delete;
+    Feed_Actor & operator=( Feed_Actor & ) = delete;
 protected:
-    StatusProt::Conjugate statusPort;
-    FeedProt::Base feedPort;
-private:
-    std::string input;
-protected:
-    INLINE_METHODS void enter3_Take_Input( void );
+    FeedProt::Conjugate feedPort;
+    INLINE_METHODS void enter3_Initialize_Feed( void );
     virtual void enterStateV( void ) override;
 private:
     INLINE_CHAINS void chain1_Initial( void );
-    INLINE_CHAINS void chain2_hatch( void );
-    INLINE_CHAINS void chain3_returnToIdle( void );
+    INLINE_CHAINS void chain2_feed_activated( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];
@@ -39,5 +33,5 @@ public:
     virtual int _followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex ) override;
 };
 #undef SUPER
-extern const RTActorClass Input;
-#endif /* Input_h */
+extern const RTActorClass Feed;
+#endif /* Feed_h */

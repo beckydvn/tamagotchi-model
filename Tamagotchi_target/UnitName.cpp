@@ -3,7 +3,7 @@
 #endif
 #include <UnitName.h>
 
-extern const RTActorClass Top;
+extern const RTActorClass Update;
 
 RTController * InputLogical;
 
@@ -36,7 +36,7 @@ static void _rtg_mapLogicalThreads( RTController * controller )
 #endif
 static const RTSystemDescriptor _rtg_system =
 {
-    &Top
+    &Update
 #if USE_THREADS
     , DEFAULT_MAIN_PRIORITY
     , 20000
@@ -50,7 +50,7 @@ static const RTSystemDescriptor _rtg_system =
 
 const char * const default_argv[] =
 {
-    "Top"
+    "Update"
 };
 
 int RTMain::entryPoint( int argc, const char * const * argv )
