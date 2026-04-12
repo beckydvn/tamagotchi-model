@@ -22,26 +22,6 @@ Feed_Actor::~Feed_Actor( void )
 {
 }
 
-INLINE_METHODS void Feed_Actor::enter3_Initialize_Feed( void )
-{
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_TM_2ADVMEfGJaL0kWrhu3A
-std::cout<< "\nWHAT WOULD YOU LIKE TO FEED YOUR PET?\nOPTIONS: (SNACK, MEAL, EXIT)" <<std::endl;
-//}}}USR
-}
-
-void Feed_Actor::enterStateV( void )
-{
-    switch( getCurrentState() )
-    {
-    case 3:
-        enter3_Initialize_Feed(  );
-        break;
-    default:
-        RTActor::enterStateV(  );
-        break;
-    }
-}
-
 INLINE_METHODS void Feed_Actor::transition3_getSnack( const void * rtdata, FeedProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_UGBWMDXwEfGJaL0kWrhu3A

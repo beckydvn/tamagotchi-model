@@ -28,6 +28,7 @@
 	TranslateInput$(OBJ_EXT)\
 	UnitName$(OBJ_EXT)\
 	Update$(OBJ_EXT)\
+	UpdateOptionsProt$(OBJ_EXT)\
 	UpdateValProt$(OBJ_EXT)
 0_OBJS_LIST = $(0_OBJS)
 0_OBJS_LISTFILE = .olist
@@ -40,6 +41,7 @@
 	TranslateInput$(DEP_EXT)\
 	UnitName$(DEP_EXT)\
 	Update$(DEP_EXT)\
+	UpdateOptionsProt$(DEP_EXT)\
 	UpdateValProt$(DEP_EXT)
 
 -include $(0_DEPFILES)
@@ -116,7 +118,7 @@ StatusProt$(OBJ_EXT) : ../StatusProt.cpp ../UnitName.h ../StatusProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:StatusProt
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../StatusProt.cpp $(CC_TAIL)
 
-TranslateInput$(OBJ_EXT) : ../TranslateInput.cpp ../UnitName.h ../TranslateInput.h ../FeedProt.h ../InputProt.h .cc.dat
+TranslateInput$(OBJ_EXT) : ../TranslateInput.cpp ../UnitName.h ../TranslateInput.h ../FeedProt.h ../InputProt.h ../UpdateOptionsProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:TranslateInput
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../TranslateInput.cpp $(CC_TAIL)
 
@@ -124,9 +126,13 @@ UnitName$(OBJ_EXT) : ../UnitName.cpp ../UnitName.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:UnitName
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../UnitName.cpp $(CC_TAIL)
 
-Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../StatusProt.h ../UpdateValProt.h ../FeedProt.h ../InputProt.h .cc.dat
+Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../StatusProt.h ../UpdateOptionsProt.h ../UpdateValProt.h ../FeedProt.h ../InputProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:Update
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Update.cpp $(CC_TAIL)
+
+UpdateOptionsProt$(OBJ_EXT) : ../UpdateOptionsProt.cpp ../UnitName.h ../UpdateOptionsProt.h .cc.dat
+	@$(FEEDBACK) Compiling Tamagotchi_target:UpdateOptionsProt
+	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../UpdateOptionsProt.cpp $(CC_TAIL)
 
 UpdateValProt$(OBJ_EXT) : ../UpdateValProt.cpp ../UnitName.h ../UpdateValProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:UpdateValProt
@@ -136,9 +142,9 @@ UpdateValProt$(OBJ_EXT) : ../UpdateValProt.cpp ../UnitName.h ../UpdateValProt.h 
 	@$(ECHO) Cleaning Tamagotchi_target
 	$(RMF) executable$(EXEC_EXT)
 	$(RMF) Feed$(OBJ_EXT) FeedProt$(OBJ_EXT) InputLoop$(OBJ_EXT) InputProt$(OBJ_EXT) StatusProt$(OBJ_EXT)
-	$(RMF) TranslateInput$(OBJ_EXT) UnitName$(OBJ_EXT) Update$(OBJ_EXT) UpdateValProt$(OBJ_EXT)
+	$(RMF) TranslateInput$(OBJ_EXT) UnitName$(OBJ_EXT) Update$(OBJ_EXT) UpdateOptionsProt$(OBJ_EXT) UpdateValProt$(OBJ_EXT)
 	$(RMF) Feed$(DEP_EXT) FeedProt$(DEP_EXT) InputLoop$(DEP_EXT) InputProt$(DEP_EXT) StatusProt$(DEP_EXT)
-	$(RMF) TranslateInput$(DEP_EXT) UnitName$(DEP_EXT) Update$(DEP_EXT) UpdateValProt$(DEP_EXT)
+	$(RMF) TranslateInput$(DEP_EXT) UnitName$(DEP_EXT) Update$(DEP_EXT) UpdateOptionsProt$(DEP_EXT) UpdateValProt$(DEP_EXT)
 	$(RMF) $(PURECOV_TARGET)
 	$(RMF) $(PURIFY_TARGET)
 	$(RMF) $(PURIFY_COV_TARGET)

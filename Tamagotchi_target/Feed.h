@@ -21,8 +21,6 @@ protected:
 private:
     int snackCount { 0 } ;
 protected:
-    INLINE_METHODS void enter3_Initialize_Feed( void );
-    virtual void enterStateV( void ) override;
     INLINE_METHODS void transition3_getSnack( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS int guard4_snackCount_3( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS void transition4_snackCount_3( const void * rtdata, FeedProt::Conjugate * rtport );

@@ -20,7 +20,6 @@ static const char * const rtg_state_names[] =
     , "RNGVal"
     , ""
     , ""
-    , ""
 };
 
 static const RTInterfaceDescriptor rtg_interfaces_input[] =
@@ -81,6 +80,10 @@ static const RTInterfaceDescriptor rtg_interfaces_translateInput[] =
         "feedPort"
         , 1
     }
+    , {
+        "updateOptionsPort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_translateInput[] =
@@ -92,6 +95,10 @@ static const RTBindingDescriptor rtg_bindings_translateInput[] =
     , {
         1
         , &FeedProt::Conjugate::rt_class
+    }
+    , {
+        2
+        , &UpdateOptionsProt::Conjugate::rt_class
     }
 };
 
@@ -187,6 +194,8 @@ INLINE_METHODS void Update_Actor::enter3_Idle( void )
 // discipline, happiness, and hunger all change over time (the first two decrease, the latter increases).
 // every time we receive a "timeout," we randomly pick one of the 3 to decrease/increase by 1 point.
 rng = (rand() % 100);
+
+std::cout << "WHAT WILL " << owner_name << " DO?" << options << std::endl;
 //}}}USR
 }
 
@@ -283,6 +292,13 @@ INLINE_METHODS void Update_Actor::transition11_ill( const int * rtdata, UpdateVa
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_aBWuYDX_EfGJaL0kWrhu3A
 std::cout<< tama_name << " IS FEELING ILL..." << std::endl;
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition13_updateOptions( const void * rtdata, UpdateOptionsProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_4APKsDYEEfGJaL0kWrhu3A
+options = (const char *)rtdata;
 //}}}USR
 }
 
@@ -418,6 +434,16 @@ INLINE_CHAINS void Update_Actor::chain12_else( void )
     enterState( 3 );
 }
 
+INLINE_CHAINS void Update_Actor::chain13_updateOptions( void )
+{
+    rtgChainBegin( 3, "updateOptions" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition13_updateOptions( msg->data, static_cast< UpdateOptionsProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
 void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
@@ -503,6 +529,16 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
+                case 5 /*updateOptionsPort*/:
+                    switch( signalIndex )
+                    {
+                    case UpdateOptionsProt::Conjugate::rti_updateOptions:
+                        chain13_updateOptions(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -535,7 +571,7 @@ const RTActor_class Update_Actor::rtg_class =
     , &Update
     , 3
     , Update_Actor::rtg_capsule_roles
-    , 4
+    , 5
     , Update_Actor::rtg_ports
     , 0
     , nullptr
@@ -579,9 +615,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 2
+        , 3
         , rtg_interfaces_translateInput
-        , 2
+        , 3
         , rtg_bindings_translateInput
     }
 };
@@ -622,6 +658,15 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , RTOffsetOf( Update_Actor, updateValPort )
         , 1
         , 4
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "updateOptionsPort"
+        , nullptr
+        , &UpdateOptionsProt::Conjugate::rt_class
+        , RTOffsetOf( Update_Actor, updateOptionsPort )
+        , 1
+        , 5
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
@@ -712,6 +757,14 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
         case 1:
             if( rtg_repIndex < 1 )
                 return feed._followIn( rtg_end, 0, rtg_repIndex );
+            break;
+        case 2:
+            if( rtg_repIndex < 1 )
+            {
+                rtg_end.port = &updateOptionsPort;
+                rtg_end.index = rtg_repIndex;
+                return 1;
+            }
             break;
         default:
             break;

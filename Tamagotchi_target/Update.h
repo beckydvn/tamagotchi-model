@@ -6,6 +6,7 @@
 #endif
 #include <UnitName.h>
 #include <StatusProt.h>
+#include <UpdateOptionsProt.h>
 #include <UpdateValProt.h>
 #define SUPER RTActor
 class Update_Actor : public RTActor
@@ -23,6 +24,7 @@ protected:
     Timing::Base timingPort;
     StatusProt::Base statusPort;
     UpdateValProt::Conjugate updateValPort;
+    UpdateOptionsProt::Conjugate updateOptionsPort;
     std::string owner_name;
 public:
     std::string tama_name;
@@ -32,6 +34,7 @@ private:
     int happiness { 5 } ;
     int health { 5 } ;
     int rng { 0 } ;
+    std::string options { "\nACTIVITY OPTIONS: (FEED)" } ;
 public:
     void showStatus( void );
 protected:
@@ -51,6 +54,7 @@ protected:
     INLINE_METHODS void transition9_is_full( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS int guard11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
+    INLINE_METHODS void transition13_updateOptions( const void * rtdata, UpdateOptionsProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_timeout( void );
@@ -64,6 +68,7 @@ private:
     INLINE_CHAINS void chain10_else( void );
     INLINE_CHAINS void chain11_ill( void );
     INLINE_CHAINS void chain12_else( void );
+    INLINE_CHAINS void chain13_updateOptions( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];
