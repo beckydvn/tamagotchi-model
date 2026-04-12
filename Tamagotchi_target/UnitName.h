@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <windows.h>
 //TC Common Preface End
 extern RTController * InputLogical;
 #endif /* UnitName_h */

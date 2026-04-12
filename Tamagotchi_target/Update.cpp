@@ -106,6 +106,10 @@ static const RTInterfaceDescriptor rtg_interfaces_translateInput[] =
         "playPort"
         , 1
     }
+    , {
+        "updateTamaPort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_translateInput[] =
@@ -125,6 +129,10 @@ static const RTBindingDescriptor rtg_bindings_translateInput[] =
     , {
         3
         , &PlayProt::Conjugate::rt_class
+    }
+    , {
+        4
+        , &UpdateTamaProt::Conjugate::rt_class
     }
 };
 
@@ -177,6 +185,13 @@ static const RTLocalBindingDescriptor rtg_local_bindings[] =
     }
 };
 
+static const RTTypeModifier rtg_tm_Update_Actor_tama =
+{
+    RTNumberConstant
+    , 1
+    , 1
+};
+
 #define SUPER RTActor
 Update_Actor::Update_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
@@ -199,6 +214,8 @@ std::cout<< "-------------------------------------------------------------------
 INLINE_METHODS void Update_Actor::enter2_Hatch( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_NnvBADUoEfGJaL0kWrhu3A
+SetConsoleOutputCP(65001);  // sets console to UTF-8
+
 std::cout << "[Status] incarnating 'input' on logical thread 'InputLogical'" << std::endl;
 RTTypedValue noData ( (const void *)0, (const RTObject_class *)0 );
 RTActorId inputThread = frameP.incarnate(input, noData, InputLogical);
@@ -264,11 +281,8 @@ void Update_Actor::enterStateV( void )
 INLINE_METHODS void Update_Actor::enter3_Idle( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_7GC-sDX8EfGJaL0kWrhu3A
-// here, we randomly generate the next event.
-// discipline, happiness, and hunger all change over time (the first two decrease, the latter increases).
-// every time we receive a "timeout," we randomly pick one of the 3 to decrease/increase by 1 point.
 rng = (rand() % 100);
-std::cout << "\nWHAT WILL " << owner_name << " DO?" << options << std::endl;
+std::cout << tama << "\nWHAT WILL " << owner_name << " DO?" << options << std::endl;
 triggerInputPort.triggerInput().send();
 //}}}USR
 }
@@ -396,6 +410,13 @@ happiness += 1;
 hunger += 1;
 resetPlayPort.resetThrow().send();
 showStatus();
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition16_updateTama( const void * rtdata, UpdateTamaProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_iSg3wDa5EfGJaL0kWrhu3A
+tama = (const char *)rtdata;
 //}}}USR
 }
 
@@ -561,6 +582,16 @@ INLINE_CHAINS void Update_Actor::chain15_timeout_sleep( void )
     enterState( 3 );
 }
 
+INLINE_CHAINS void Update_Actor::chain16_updateTama( void )
+{
+    rtgChainBegin( 3, "updateTama" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition16_updateTama( msg->data, static_cast< UpdateTamaProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
 void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
@@ -669,6 +700,16 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
+                case 10 /*updateTamaPort*/:
+                    switch( signalIndex )
+                    {
+                    case UpdateTamaProt::Conjugate::rti_updateTama:
+                        chain16_updateTama(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -701,11 +742,11 @@ const RTActor_class Update_Actor::rtg_class =
     , &Update
     , 4
     , Update_Actor::rtg_capsule_roles
-    , 9
+    , 10
     , Update_Actor::rtg_ports
     , 1
     , rtg_local_bindings
-    , 9
+    , 10
     , Update_Actor::rtg_Update_Actor_fields
 };
 
@@ -745,9 +786,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 4
+        , 5
         , rtg_interfaces_translateInput
-        , 4
+        , 5
         , rtg_bindings_translateInput
     }
     , {
@@ -848,6 +889,15 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , 9
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
+    , {
+        "updateTamaPort"
+        , nullptr
+        , &UpdateTamaProt::Conjugate::rt_class
+        , RTOffsetOf( Update_Actor, updateTamaPort )
+        , 1
+        , 10
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
 };
 
 const RTFieldDescriptor Update_Actor::rtg_Update_Actor_fields[] =
@@ -905,6 +955,12 @@ const RTFieldDescriptor Update_Actor::rtg_Update_Actor_fields[] =
         , RTOffsetOf( Update_Actor, updateValTimer )
         , &RTType_RTTimerId
         , nullptr
+    }
+    , {
+        "tama"
+        , RTOffsetOf( Update_Actor, tama )
+        , &RTType_char
+        , &rtg_tm_Update_Actor_tama
     }
 };
 
@@ -988,6 +1044,14 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
         case 3:
             if( rtg_repIndex < 1 )
                 return play._followIn( rtg_end, 0, rtg_repIndex );
+            break;
+        case 4:
+            if( rtg_repIndex < 1 )
+            {
+                rtg_end.port = &updateTamaPort;
+                rtg_end.index = rtg_repIndex;
+                return 1;
+            }
             break;
         default:
             break;

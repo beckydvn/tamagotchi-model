@@ -83,7 +83,7 @@ updateValPort.updateHealth(-3).send();
 INLINE_METHODS void Feed_Actor::transition6_getMeal( const void * rtdata, FeedProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_wAme0DX9EfGJaL0kWrhu3A
-std::cout<< "\nYOU FED YOUR PET A MEAL." <<std::endl;
+std::cout<< "\nATE THE MEAL..." <<std::endl;
 updateValPort.updateHunger(3).send();
 //}}}USR
 }

@@ -60,9 +60,11 @@ if(mode == "IDLE"){
 else if(mode == "FEED"){
 	if(input == "SNACK"){
 		feedPort.feedSnack().send();
+		updateTamaPort.updateTama(tama_snack).send();
 	}
 	else if(input == "MEAL"){
 		feedPort.feedMeal().send();
+		updateTamaPort.updateTama(tama_meal).send();
 	}
 	else if(input == "EXIT"){
 		updateOptionsPort.updateOptions(idleOptions).send();
@@ -73,6 +75,7 @@ else if(mode == "FEED"){
 else if(mode == "PLAY"){
 	if(input == "FETCH"){
 		playPort.throwBall().send();
+		updateTamaPort.updateTama(tama_play).send();
 	}
 	else if(input == "EXIT"){
 		updateOptionsPort.updateOptions(idleOptions).send();
@@ -244,7 +247,7 @@ const RTActor_class TranslateInput_Actor::rtg_class =
     , &TranslateInput
     , 0
     , nullptr
-    , 4
+    , 5
     , TranslateInput_Actor::rtg_ports
     , 0
     , nullptr
@@ -288,6 +291,15 @@ const RTPortDescriptor TranslateInput_Actor::rtg_ports[] =
         , RTOffsetOf( TranslateInput_Actor, playPort )
         , 1
         , 4
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "updateTamaPort"
+        , nullptr
+        , &UpdateTamaProt::Base::rt_class
+        , RTOffsetOf( TranslateInput_Actor, updateTamaPort )
+        , 1
+        , 5
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
@@ -350,6 +362,14 @@ int TranslateInput_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, in
             return 1;
         }
         break;
+    case 4:
+        if( rtg_repIndex < 1 )
+        {
+            rtg_end.port = &updateTamaPort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
     default:
         break;
     }
@@ -379,6 +399,11 @@ static const RTRelayDescriptor rtg_relays[] =
         , &PlayProt::Base::rt_class
         , 1
     }
+    , {
+        "updateTamaPort"
+        , &UpdateTamaProt::Base::rt_class
+        , 1
+    }
 };
 
 static RTActor * new_TranslateInput_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
@@ -391,7 +416,7 @@ const RTActorClass TranslateInput =
     nullptr
     , "TranslateInput"
     , 0 /*RTVersionId*/
-    , 4
+    , 5
     , rtg_relays
     , new_TranslateInput_Actor
 };
