@@ -25,18 +25,15 @@ INLINE_METHODS void InputLoop_Actor::enter3_Take_Input( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Z0mKADUpEfGJaL0kWrhu3A
 char userInput[256];
+fgets(userInput, sizeof(userInput), stdin);
 
-while(true){
-	fgets(userInput, sizeof(userInput), stdin);
+userInput[strcspn(userInput, "\n")] = '\0';
 
-	userInput[strcspn(userInput, "\n")] = '\0';
-
-	for (int i = 0; userInput[i]; i++) {
-			userInput[i] = toupper(userInput[i]);
-	}
-
-	inputPort.gotInput(userInput).send();
+for (int i = 0; userInput[i]; i++) {
+		userInput[i] = toupper(userInput[i]);
 }
+
+inputPort.gotInput(userInput).send();
 //}}}USR
 }
 
@@ -64,6 +61,15 @@ INLINE_CHAINS void InputLoop_Actor::chain1_Initial( void )
 INLINE_CHAINS void InputLoop_Actor::chain2_hatch( void )
 {
     rtgChainBegin( 2, "hatch" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void InputLoop_Actor::chain3_input_requested( void )
+{
+    rtgChainBegin( 3, "input requested" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
@@ -132,6 +138,16 @@ void InputLoop_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
+                case 3 /*triggerInputPort*/:
+                    switch( signalIndex )
+                    {
+                    case InputProt::Conjugate::rti_triggerInput:
+                        chain3_input_requested(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -164,7 +180,7 @@ const RTActor_class InputLoop_Actor::rtg_class =
     , &InputLoop
     , 0
     , nullptr
-    , 2
+    , 3
     , InputLoop_Actor::rtg_ports
     , 0
     , nullptr
@@ -192,6 +208,15 @@ const RTPortDescriptor InputLoop_Actor::rtg_ports[] =
         , 2
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
+    , {
+        "triggerInputPort"
+        , nullptr
+        , &InputProt::Conjugate::rt_class
+        , RTOffsetOf( InputLoop_Actor, triggerInputPort )
+        , 3
+        , 3
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
 };
 
 int InputLoop_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
@@ -210,6 +235,14 @@ int InputLoop_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg
         if( rtg_repIndex < 1 )
         {
             rtg_end.port = &inputPort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
+    case 2:
+        if( rtg_repIndex < 3 )
+        {
+            rtg_end.port = &triggerInputPort;
             rtg_end.index = rtg_repIndex;
             return 1;
         }
@@ -233,6 +266,11 @@ static const RTRelayDescriptor rtg_relays[] =
         , &InputProt::Base::rt_class
         , 1
     }
+    , {
+        "triggerInputPort"
+        , &InputProt::Conjugate::rt_class
+        , 3
+    }
 };
 
 static RTActor * new_InputLoop_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
@@ -245,7 +283,7 @@ const RTActorClass InputLoop =
     nullptr
     , "InputLoop"
     , 0 /*RTVersionId*/
-    , 2
+    , 3
     , rtg_relays
     , new_InputLoop_Actor
 };

@@ -5,6 +5,8 @@
 #pragma interface "Update.h"
 #endif
 #include <UnitName.h>
+#include <InputProt.h>
+#include <ResetPlayProt.h>
 #include <StatusProt.h>
 #include <UpdateOptionsProt.h>
 #include <UpdateValProt.h>
@@ -28,6 +30,8 @@ protected:
     UpdateOptionsProt::Conjugate updateOptionsPort;
     Timing::Base timingSleepPort;
     StatusProt::Conjugate statusProtR;
+    InputProt::Base triggerInputPort;
+    ResetPlayProt::Base resetPlayPort;
     std::string owner_name;
 public:
     std::string tama_name;

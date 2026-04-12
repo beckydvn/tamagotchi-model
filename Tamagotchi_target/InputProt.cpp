@@ -34,7 +34,7 @@ const RTProtocolDescriptor InputProt::Conjugate::rt_class =
     , &InputProt::Base::rt_class
     , "InputProt"
     , 0
-    , 3
+    , 4
     , InputProt::Conjugate::rt_signals
 };
 
@@ -54,6 +54,11 @@ const RTSignalDescriptor InputProt::Conjugate::rt_signals[] =
         "rtUnbound"
         , nullptr
         , InputProt::Conjugate::rti_rtUnbound
+    }
+    , {
+        "triggerInput"
+        , &RTType_void
+        , InputProt::Conjugate::rti_triggerInput
     }
 };
 

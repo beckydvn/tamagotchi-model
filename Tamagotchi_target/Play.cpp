@@ -22,6 +22,26 @@ Play_Actor::~Play_Actor( void )
 {
 }
 
+INLINE_METHODS void Play_Actor::enter3_Initiate_Play( void )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_7v36YDaiEfGJaL0kWrhu3A
+triggerInputPort.triggerInput().send();
+//}}}USR
+}
+
+void Play_Actor::enterStateV( void )
+{
+    switch( getCurrentState() )
+    {
+    case 3:
+        enter3_Initiate_Play(  );
+        break;
+    default:
+        RTActor::enterStateV(  );
+        break;
+    }
+}
+
 INLINE_METHODS void Play_Actor::transition3_throwBall( const void * rtdata, PlayProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_UrMnYDYSEfGJaL0kWrhu3A
@@ -59,9 +79,16 @@ throwCount = 0;
 //}}}USR
 }
 
-INLINE_METHODS void Play_Actor::transition7_sleep( const void * rtdata, UpdateValProt::Base * rtport )
+INLINE_METHODS void Play_Actor::transition7_sleep( const void * rtdata, ResetPlayProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_fNh5EDaTEfGJaL0kWrhu3A
+throwCount = 0;
+//}}}USR
+}
+
+INLINE_METHODS void Play_Actor::transition8_sleep( const void * rtdata, ResetPlayProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_bpCEUDajEfGJaL0kWrhu3A
 throwCount = 0;
 //}}}USR
 }
@@ -131,7 +158,7 @@ INLINE_CHAINS void Play_Actor::chain7_sleep( void )
     rtgChainBegin( 3, "sleep" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
-    transition7_sleep( msg->data, static_cast< UpdateValProt::Base * > ( msg->sap() ) );
+    transition7_sleep( msg->data, static_cast< ResetPlayProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
@@ -141,6 +168,7 @@ INLINE_CHAINS void Play_Actor::chain8_sleep( void )
     rtgChainBegin( 2, "sleep" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
+    transition8_sleep( msg->data, static_cast< ResetPlayProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 2 );
 }
@@ -191,10 +219,10 @@ void Play_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 2 /*updateValPort*/:
+                case 4 /*resetPlayPort*/:
                     switch( signalIndex )
                     {
-                    case UpdateValProt::Base::rti_resetThrow:
+                    case ResetPlayProt::Conjugate::rti_resetThrow:
                         chain8_sleep(  );
                         return ;
                     default:
@@ -230,10 +258,10 @@ void Play_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 2 /*updateValPort*/:
+                case 4 /*resetPlayPort*/:
                     switch( signalIndex )
                     {
-                    case UpdateValProt::Base::rti_resetThrow:
+                    case ResetPlayProt::Conjugate::rti_resetThrow:
                         chain7_sleep(  );
                         return ;
                     default:
@@ -272,7 +300,7 @@ const RTActor_class Play_Actor::rtg_class =
     , &Play
     , 0
     , nullptr
-    , 2
+    , 4
     , Play_Actor::rtg_ports
     , 0
     , nullptr
@@ -298,6 +326,24 @@ const RTPortDescriptor Play_Actor::rtg_ports[] =
         , RTOffsetOf( Play_Actor, updateValPort )
         , 1
         , 2
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "triggerInputPort"
+        , nullptr
+        , &InputProt::Base::rt_class
+        , RTOffsetOf( Play_Actor, triggerInputPort )
+        , 1
+        , 3
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "resetPlayPort"
+        , nullptr
+        , &ResetPlayProt::Conjugate::rt_class
+        , RTOffsetOf( Play_Actor, resetPlayPort )
+        , 1
+        , 4
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
@@ -332,6 +378,22 @@ int Play_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repI
             return 1;
         }
         break;
+    case 2:
+        if( rtg_repIndex < 1 )
+        {
+            rtg_end.port = &triggerInputPort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
+    case 3:
+        if( rtg_repIndex < 1 )
+        {
+            rtg_end.port = &resetPlayPort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
     default:
         break;
     }
@@ -351,6 +413,16 @@ static const RTRelayDescriptor rtg_relays[] =
         , &UpdateValProt::Base::rt_class
         , 1
     }
+    , {
+        "triggerInputPort"
+        , &InputProt::Base::rt_class
+        , 1
+    }
+    , {
+        "resetPlayPort"
+        , &ResetPlayProt::Conjugate::rt_class
+        , 1
+    }
 };
 
 static RTActor * new_Play_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
@@ -363,7 +435,7 @@ const RTActorClass Play =
     nullptr
     , "Play"
     , 0 /*RTVersionId*/
-    , 2
+    , 4
     , rtg_relays
     , new_Play_Actor
 };

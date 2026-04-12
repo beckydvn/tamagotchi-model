@@ -4,7 +4,6 @@
 #include <UnitName.h>
 #include <Update.h>
 #include <FeedProt.h>
-#include <InputProt.h>
 #include <PlayProt.h>
 
 extern const RTActorClass Feed;
@@ -35,6 +34,10 @@ static const RTInterfaceDescriptor rtg_interfaces_input[] =
         "inputPort"
         , 1
     }
+    , {
+        "triggerInputPort"
+        , 3
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_input[] =
@@ -46,6 +49,10 @@ static const RTBindingDescriptor rtg_bindings_input[] =
     , {
         1
         , &InputProt::Conjugate::rt_class
+    }
+    , {
+        2
+        , &InputProt::Base::rt_class
     }
 };
 
@@ -59,6 +66,10 @@ static const RTInterfaceDescriptor rtg_interfaces_feed[] =
         "updateValPort"
         , 1
     }
+    , {
+        "triggerInputPort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_feed[] =
@@ -70,6 +81,10 @@ static const RTBindingDescriptor rtg_bindings_feed[] =
     , {
         1
         , &UpdateValProt::Conjugate::rt_class
+    }
+    , {
+        2
+        , &InputProt::Conjugate::rt_class
     }
 };
 
@@ -123,6 +138,14 @@ static const RTInterfaceDescriptor rtg_interfaces_play[] =
         "updateValPort"
         , 1
     }
+    , {
+        "triggerInputPort"
+        , 1
+    }
+    , {
+        "resetPlayPort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_play[] =
@@ -134,6 +157,14 @@ static const RTBindingDescriptor rtg_bindings_play[] =
     , {
         1
         , &UpdateValProt::Conjugate::rt_class
+    }
+    , {
+        2
+        , &InputProt::Conjugate::rt_class
+    }
+    , {
+        3
+        , &ResetPlayProt::Base::rt_class
     }
 };
 
@@ -237,8 +268,8 @@ INLINE_METHODS void Update_Actor::enter3_Idle( void )
 // discipline, happiness, and hunger all change over time (the first two decrease, the latter increases).
 // every time we receive a "timeout," we randomly pick one of the 3 to decrease/increase by 1 point.
 rng = (rand() % 100);
-
 std::cout << "\nWHAT WILL " << owner_name << " DO?" << options << std::endl;
+triggerInputPort.triggerInput().send();
 //}}}USR
 }
 
@@ -363,7 +394,7 @@ std::cout << "\n" << tama_name << " IS FEELING ENERGIZED!" << std::endl;
 health += 1;
 happiness += 1;
 hunger += 1;
-updateValPort.resetThrow();
+resetPlayPort.resetThrow().send();
 showStatus();
 //}}}USR
 }
@@ -670,7 +701,7 @@ const RTActor_class Update_Actor::rtg_class =
     , &Update
     , 4
     , Update_Actor::rtg_capsule_roles
-    , 7
+    , 9
     , Update_Actor::rtg_ports
     , 1
     , rtg_local_bindings
@@ -688,9 +719,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Optional
         , 1
         , 1
-        , 2
+        , 3
         , rtg_interfaces_input
-        , 2
+        , 3
         , rtg_bindings_input
     }
     , {
@@ -701,9 +732,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 2
+        , 3
         , rtg_interfaces_feed
-        , 2
+        , 3
         , rtg_bindings_feed
     }
     , {
@@ -727,9 +758,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 2
+        , 4
         , rtg_interfaces_play
-        , 2
+        , 4
         , rtg_bindings_play
     }
 };
@@ -797,6 +828,24 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , RTOffsetOf( Update_Actor, statusProtR )
         , 1
         , 7
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "triggerInputPort"
+        , nullptr
+        , &InputProt::Base::rt_class
+        , RTOffsetOf( Update_Actor, triggerInputPort )
+        , 1
+        , 8
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "resetPlayPort"
+        , nullptr
+        , &ResetPlayProt::Base::rt_class
+        , RTOffsetOf( Update_Actor, resetPlayPort )
+        , 1
+        , 9
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
@@ -878,6 +927,18 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
             if( rtg_repIndex < 1 )
                 return translateInput._followIn( rtg_end, 0, rtg_repIndex );
             break;
+        case 2:
+            if( rtg_repIndex < 1 )
+            {
+                rtg_end.port = &triggerInputPort;
+                rtg_end.index = rtg_repIndex;
+                return 1;
+            }
+            if( rtg_repIndex < 2 )
+                return feed._followIn( rtg_end, 2, rtg_repIndex - 1 );
+            if( rtg_repIndex < 3 )
+                return play._followIn( rtg_end, 2, rtg_repIndex - 2 );
+            break;
         default:
             break;
         }
@@ -896,6 +957,10 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
                 rtg_end.index = rtg_repIndex;
                 return 1;
             }
+            break;
+        case 2:
+            if( rtg_repIndex < 1 )
+                return input._followIn( rtg_end, 2, rtg_repIndex + 1 );
             break;
         default:
             break;
@@ -940,6 +1005,18 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
             {
                 rtg_end.port = &updateValPort;
                 rtg_end.index = rtg_repIndex + 1;
+                return 1;
+            }
+            break;
+        case 2:
+            if( rtg_repIndex < 1 )
+                return input._followIn( rtg_end, 2, rtg_repIndex + 2 );
+            break;
+        case 3:
+            if( rtg_repIndex < 1 )
+            {
+                rtg_end.port = &resetPlayPort;
+                rtg_end.index = rtg_repIndex;
                 return 1;
             }
             break;

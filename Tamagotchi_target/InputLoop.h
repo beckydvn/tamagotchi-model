@@ -18,11 +18,13 @@ public:
 protected:
     StatusProt::Conjugate statusPort;
     InputProt::Base inputPort;
+    InputProt::Conjugate triggerInputPort;
     INLINE_METHODS void enter3_Take_Input( void );
     virtual void enterStateV( void ) override;
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_hatch( void );
+    INLINE_CHAINS void chain3_input_requested( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

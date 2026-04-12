@@ -6,6 +6,7 @@
 #endif
 #include <UnitName.h>
 #include <FeedProt.h>
+#include <InputProt.h>
 #include <UpdateValProt.h>
 #define SUPER RTActor
 class Feed_Actor : public RTActor
@@ -18,9 +19,12 @@ public:
 protected:
     FeedProt::Conjugate feedPort;
     UpdateValProt::Base updateValPort;
+    InputProt::Base triggerInputPort;
 private:
     int snackCount { 0 } ;
 protected:
+    INLINE_METHODS void enter3_Initiate_Feed( void );
+    virtual void enterStateV( void ) override;
     INLINE_METHODS void transition3_getSnack( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS int guard4_snackCount_3( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS void transition4_snackCount_3( const void * rtdata, FeedProt::Conjugate * rtport );

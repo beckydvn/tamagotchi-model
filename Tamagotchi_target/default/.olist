@@ -4,6 +4,7 @@ InputLoop
 InputProt
 Play
 PlayProt
+ResetPlayProt
 StatusProt
 TranslateInput
 UnitName

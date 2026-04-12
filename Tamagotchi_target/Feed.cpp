@@ -22,6 +22,26 @@ Feed_Actor::~Feed_Actor( void )
 {
 }
 
+INLINE_METHODS void Feed_Actor::enter3_Initiate_Feed( void )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_659mEDaiEfGJaL0kWrhu3A
+triggerInputPort.triggerInput().send();
+//}}}USR
+}
+
+void Feed_Actor::enterStateV( void )
+{
+    switch( getCurrentState() )
+    {
+    case 3:
+        enter3_Initiate_Feed(  );
+        break;
+    default:
+        RTActor::enterStateV(  );
+        break;
+    }
+}
+
 INLINE_METHODS void Feed_Actor::transition3_getSnack( const void * rtdata, FeedProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_UGBWMDXwEfGJaL0kWrhu3A
@@ -259,7 +279,7 @@ const RTActor_class Feed_Actor::rtg_class =
     , &Feed
     , 0
     , nullptr
-    , 2
+    , 3
     , Feed_Actor::rtg_ports
     , 0
     , nullptr
@@ -285,6 +305,15 @@ const RTPortDescriptor Feed_Actor::rtg_ports[] =
         , RTOffsetOf( Feed_Actor, updateValPort )
         , 1
         , 2
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "triggerInputPort"
+        , nullptr
+        , &InputProt::Base::rt_class
+        , RTOffsetOf( Feed_Actor, triggerInputPort )
+        , 1
+        , 3
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
@@ -319,6 +348,14 @@ int Feed_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repI
             return 1;
         }
         break;
+    case 2:
+        if( rtg_repIndex < 1 )
+        {
+            rtg_end.port = &triggerInputPort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
     default:
         break;
     }
@@ -338,6 +375,11 @@ static const RTRelayDescriptor rtg_relays[] =
         , &UpdateValProt::Base::rt_class
         , 1
     }
+    , {
+        "triggerInputPort"
+        , &InputProt::Base::rt_class
+        , 1
+    }
 };
 
 static RTActor * new_Feed_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
@@ -350,7 +392,7 @@ const RTActorClass Feed =
     nullptr
     , "Feed"
     , 0 /*RTVersionId*/
-    , 2
+    , 3
     , rtg_relays
     , new_Feed_Actor
 };

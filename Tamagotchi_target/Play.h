@@ -5,7 +5,9 @@
 #pragma interface "Play.h"
 #endif
 #include <UnitName.h>
+#include <InputProt.h>
 #include <PlayProt.h>
+#include <ResetPlayProt.h>
 #include <UpdateValProt.h>
 #define SUPER RTActor
 class Play_Actor : public RTActor
@@ -18,15 +20,20 @@ public:
 protected:
     PlayProt::Conjugate playPort;
     UpdateValProt::Base updateValPort;
+    InputProt::Base triggerInputPort;
+    ResetPlayProt::Conjugate resetPlayPort;
 private:
     int throwCount { 0 } ;
 protected:
+    INLINE_METHODS void enter3_Initiate_Play( void );
+    virtual void enterStateV( void ) override;
     INLINE_METHODS void transition3_throwBall( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS int guard4_throws_5( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition4_throws_5( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition5_caught_last( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition6_exit( const void * rtdata, PlayProt::Conjugate * rtport );
-    INLINE_METHODS void transition7_sleep( const void * rtdata, UpdateValProt::Base * rtport );
+    INLINE_METHODS void transition7_sleep( const void * rtdata, ResetPlayProt::Conjugate * rtport );
+    INLINE_METHODS void transition8_sleep( const void * rtdata, ResetPlayProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_play_activated( void );
