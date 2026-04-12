@@ -8,7 +8,7 @@ static const char * const rtg_state_names[] =
 {
     "<machine>"
     , "Start"
-    , "Initialize Feed"
+    , "Initiate Feed"
     , ""
 };
 
@@ -65,6 +65,13 @@ INLINE_METHODS void Feed_Actor::transition6_getMeal( const void * rtdata, FeedPr
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_wAme0DX9EfGJaL0kWrhu3A
 std::cout<< "\nYOU FED YOUR PET A MEAL." <<std::endl;
 updateValPort.updateHunger(3).send();
+//}}}USR
+}
+
+INLINE_METHODS void Feed_Actor::transition7_exit( const void * rtdata, FeedProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_sLdXQDYTEfGJaL0kWrhu3A
+snackCount = 0;
 //}}}USR
 }
 
@@ -137,6 +144,7 @@ INLINE_CHAINS void Feed_Actor::chain7_exit( void )
     rtgChainBegin( 3, "exit" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
+    transition7_exit( msg->data, static_cast< FeedProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 2 );
 }
@@ -191,7 +199,7 @@ void Feed_Actor::rtsBehavior( int signalIndex, int portIndex )
                     break;
                 }
                 break;
-            case 3 /* Initialize Feed (State Machine::Initialize Feed) */:
+            case 3 /* Initiate Feed (State Machine::Initiate Feed) */:
                 switch( portIndex )
                 {
                 case 0 /*RTControlPort*/:

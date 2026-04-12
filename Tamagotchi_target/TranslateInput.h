@@ -7,6 +7,7 @@
 #include <UnitName.h>
 #include <FeedProt.h>
 #include <InputProt.h>
+#include <PlayProt.h>
 #include <UpdateOptionsProt.h>
 #define SUPER RTActor
 class TranslateInput_Actor : public RTActor
@@ -20,11 +21,13 @@ protected:
     InputProt::Conjugate inputPort;
     FeedProt::Base feedPort;
     UpdateOptionsProt::Base updateOptionsPort;
+    PlayProt::Base playPort;
 private:
     std::string input;
     std::string mode { "IDLE" } ;
     const char* feedOptions { "\nFEED OPTIONS: (SNACK, MEAL, EXIT)" } ;
-    const char* idleOptions { "\nACTIVITY OPTIONS: (FEED)" } ;
+    const char* idleOptions { "\nACTIVITY OPTIONS: (FEED, PLAY)" } ;
+    const char* playOptions { "\nPLAY OPTIONS: (FETCH, EXIT)" } ;
 protected:
     INLINE_METHODS void enter3_Send_Signals( void );
     virtual void enterStateV( void ) override;

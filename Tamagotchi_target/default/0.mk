@@ -24,6 +24,8 @@
 	FeedProt$(OBJ_EXT)\
 	InputLoop$(OBJ_EXT)\
 	InputProt$(OBJ_EXT)\
+	Play$(OBJ_EXT)\
+	PlayProt$(OBJ_EXT)\
 	StatusProt$(OBJ_EXT)\
 	TranslateInput$(OBJ_EXT)\
 	UnitName$(OBJ_EXT)\
@@ -37,6 +39,8 @@
 	FeedProt$(DEP_EXT)\
 	InputLoop$(DEP_EXT)\
 	InputProt$(DEP_EXT)\
+	Play$(DEP_EXT)\
+	PlayProt$(DEP_EXT)\
 	StatusProt$(DEP_EXT)\
 	TranslateInput$(DEP_EXT)\
 	UnitName$(DEP_EXT)\
@@ -114,11 +118,19 @@ InputProt$(OBJ_EXT) : ../InputProt.cpp ../UnitName.h ../InputProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:InputProt
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../InputProt.cpp $(CC_TAIL)
 
+Play$(OBJ_EXT) : ../Play.cpp ../UnitName.h ../Play.h ../PlayProt.h ../UpdateValProt.h .cc.dat
+	@$(FEEDBACK) Compiling Tamagotchi_target:Play
+	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Play.cpp $(CC_TAIL)
+
+PlayProt$(OBJ_EXT) : ../PlayProt.cpp ../UnitName.h ../PlayProt.h .cc.dat
+	@$(FEEDBACK) Compiling Tamagotchi_target:PlayProt
+	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../PlayProt.cpp $(CC_TAIL)
+
 StatusProt$(OBJ_EXT) : ../StatusProt.cpp ../UnitName.h ../StatusProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:StatusProt
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../StatusProt.cpp $(CC_TAIL)
 
-TranslateInput$(OBJ_EXT) : ../TranslateInput.cpp ../UnitName.h ../TranslateInput.h ../FeedProt.h ../InputProt.h ../UpdateOptionsProt.h .cc.dat
+TranslateInput$(OBJ_EXT) : ../TranslateInput.cpp ../UnitName.h ../TranslateInput.h ../FeedProt.h ../InputProt.h ../PlayProt.h ../UpdateOptionsProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:TranslateInput
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../TranslateInput.cpp $(CC_TAIL)
 
@@ -126,7 +138,7 @@ UnitName$(OBJ_EXT) : ../UnitName.cpp ../UnitName.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:UnitName
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../UnitName.cpp $(CC_TAIL)
 
-Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../StatusProt.h ../UpdateOptionsProt.h ../UpdateValProt.h ../FeedProt.h ../InputProt.h .cc.dat
+Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../StatusProt.h ../UpdateOptionsProt.h ../UpdateValProt.h ../FeedProt.h ../InputProt.h ../PlayProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:Update
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Update.cpp $(CC_TAIL)
 
@@ -141,10 +153,12 @@ UpdateValProt$(OBJ_EXT) : ../UpdateValProt.cpp ../UnitName.h ../UpdateValProt.h 
 0_clean :
 	@$(ECHO) Cleaning Tamagotchi_target
 	$(RMF) executable$(EXEC_EXT)
-	$(RMF) Feed$(OBJ_EXT) FeedProt$(OBJ_EXT) InputLoop$(OBJ_EXT) InputProt$(OBJ_EXT) StatusProt$(OBJ_EXT)
-	$(RMF) TranslateInput$(OBJ_EXT) UnitName$(OBJ_EXT) Update$(OBJ_EXT) UpdateOptionsProt$(OBJ_EXT) UpdateValProt$(OBJ_EXT)
-	$(RMF) Feed$(DEP_EXT) FeedProt$(DEP_EXT) InputLoop$(DEP_EXT) InputProt$(DEP_EXT) StatusProt$(DEP_EXT)
-	$(RMF) TranslateInput$(DEP_EXT) UnitName$(DEP_EXT) Update$(DEP_EXT) UpdateOptionsProt$(DEP_EXT) UpdateValProt$(DEP_EXT)
+	$(RMF) Feed$(OBJ_EXT) FeedProt$(OBJ_EXT) InputLoop$(OBJ_EXT) InputProt$(OBJ_EXT) Play$(OBJ_EXT)
+	$(RMF) PlayProt$(OBJ_EXT) StatusProt$(OBJ_EXT) TranslateInput$(OBJ_EXT) UnitName$(OBJ_EXT) Update$(OBJ_EXT)
+	$(RMF) UpdateOptionsProt$(OBJ_EXT) UpdateValProt$(OBJ_EXT)
+	$(RMF) Feed$(DEP_EXT) FeedProt$(DEP_EXT) InputLoop$(DEP_EXT) InputProt$(DEP_EXT) Play$(DEP_EXT)
+	$(RMF) PlayProt$(DEP_EXT) StatusProt$(DEP_EXT) TranslateInput$(DEP_EXT) UnitName$(DEP_EXT) Update$(DEP_EXT)
+	$(RMF) UpdateOptionsProt$(DEP_EXT) UpdateValProt$(DEP_EXT)
 	$(RMF) $(PURECOV_TARGET)
 	$(RMF) $(PURIFY_TARGET)
 	$(RMF) $(PURIFY_COV_TARGET)

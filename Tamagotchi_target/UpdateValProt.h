@@ -20,6 +20,7 @@ struct UpdateValProt
     public:
         inline RTOutSignal updateHunger( const int & data );
         inline RTOutSignal updateHealth( const int & data );
+        inline RTOutSignal updateHappiness( const int & data );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -33,15 +34,17 @@ struct UpdateValProt
         {
             rti_updateHunger = rtiLast_RTRootProtocol + 1
             , rti_updateHealth
+            , rti_updateHappiness
         };
     protected:
         enum
         {
-            rtiLast_UpdateValProt = rti_updateHealth
+            rtiLast_UpdateValProt = rti_updateHappiness
         };
     public:
         inline RTInSignal updateHunger( void );
         inline RTInSignal updateHealth( void );
+        inline RTInSignal updateHappiness( void );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -66,6 +69,11 @@ inline RTOutSignal UpdateValProt::Base::updateHealth( const int & data )
     return RTOutSignal( this, Conjugate::rti_updateHealth, &data, &RTType_int );
 }
 
+inline RTOutSignal UpdateValProt::Base::updateHappiness( const int & data )
+{
+    return RTOutSignal( this, Conjugate::rti_updateHappiness, &data, &RTType_int );
+}
+
 inline UpdateValProt::Conjugate::Conjugate( void )
     : RTRootProtocol(  )
 {
@@ -83,6 +91,11 @@ inline RTInSignal UpdateValProt::Conjugate::updateHunger( void )
 inline RTInSignal UpdateValProt::Conjugate::updateHealth( void )
 {
     return RTInSignal( this, rti_updateHealth );
+}
+
+inline RTInSignal UpdateValProt::Conjugate::updateHappiness( void )
+{
+    return RTInSignal( this, rti_updateHappiness );
 }
 
 #endif /* UpdateValProt_h */

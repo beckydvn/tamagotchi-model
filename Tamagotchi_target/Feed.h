@@ -27,6 +27,7 @@ protected:
     INLINE_METHODS int guard5_else( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS void transition5_else( const void * rtdata, FeedProt::Conjugate * rtport );
     INLINE_METHODS void transition6_getMeal( const void * rtdata, FeedProt::Conjugate * rtport );
+    INLINE_METHODS void transition7_exit( const void * rtdata, FeedProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_feed_activated( void );

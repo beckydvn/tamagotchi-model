@@ -20,6 +20,7 @@ protected:
     RTActorRef input;
     RTActorRef feed;
     RTActorRef translateInput;
+    RTActorRef play;
     Frame::Base frameP;
     Timing::Base timingPort;
     StatusProt::Base statusPort;
@@ -34,7 +35,7 @@ private:
     int happiness { 5 } ;
     int health { 5 } ;
     int rng { 0 } ;
-    std::string options { "\nACTIVITY OPTIONS: (FEED)" } ;
+    std::string options { "\nACTIVITY OPTIONS: (FEED, PLAY)" } ;
 public:
     void showStatus( void );
 protected:
@@ -55,6 +56,7 @@ protected:
     INLINE_METHODS int guard11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition13_updateOptions( const void * rtdata, UpdateOptionsProt::Conjugate * rtport );
+    INLINE_METHODS void transition14_updateHappiness( const int * rtdata, UpdateValProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_timeout( void );
@@ -69,6 +71,7 @@ private:
     INLINE_CHAINS void chain11_ill( void );
     INLINE_CHAINS void chain12_else( void );
     INLINE_CHAINS void chain13_updateOptions( void );
+    INLINE_CHAINS void chain14_updateHappiness( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

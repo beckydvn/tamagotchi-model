@@ -5,10 +5,13 @@
 #include <Update.h>
 #include <FeedProt.h>
 #include <InputProt.h>
+#include <PlayProt.h>
 
 extern const RTActorClass Feed;
 
 extern const RTActorClass InputLoop;
+
+extern const RTActorClass Play;
 
 extern const RTActorClass TranslateInput;
 
@@ -84,6 +87,10 @@ static const RTInterfaceDescriptor rtg_interfaces_translateInput[] =
         "updateOptionsPort"
         , 1
     }
+    , {
+        "playPort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_translateInput[] =
@@ -99,6 +106,34 @@ static const RTBindingDescriptor rtg_bindings_translateInput[] =
     , {
         2
         , &UpdateOptionsProt::Conjugate::rt_class
+    }
+    , {
+        3
+        , &PlayProt::Conjugate::rt_class
+    }
+};
+
+static const RTInterfaceDescriptor rtg_interfaces_play[] =
+{
+    {
+        "playPort"
+        , 1
+    }
+    , {
+        "updateValPort"
+        , 1
+    }
+};
+
+static const RTBindingDescriptor rtg_bindings_play[] =
+{
+    {
+        0
+        , &PlayProt::Base::rt_class
+    }
+    , {
+        1
+        , &UpdateValProt::Conjugate::rt_class
     }
 };
 
@@ -195,7 +230,7 @@ INLINE_METHODS void Update_Actor::enter3_Idle( void )
 // every time we receive a "timeout," we randomly pick one of the 3 to decrease/increase by 1 point.
 rng = (rand() % 100);
 
-std::cout << "WHAT WILL " << owner_name << " DO?" << options << std::endl;
+std::cout << "\nWHAT WILL " << owner_name << " DO?" << options << std::endl;
 //}}}USR
 }
 
@@ -299,6 +334,14 @@ INLINE_METHODS void Update_Actor::transition13_updateOptions( const void * rtdat
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_4APKsDYEEfGJaL0kWrhu3A
 options = (const char *)rtdata;
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition14_updateHappiness( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_AaW5gDYUEfGJaL0kWrhu3A
+happiness += *rtdata;
+showStatus();
 //}}}USR
 }
 
@@ -444,6 +487,16 @@ INLINE_CHAINS void Update_Actor::chain13_updateOptions( void )
     enterState( 3 );
 }
 
+INLINE_CHAINS void Update_Actor::chain14_updateHappiness( void )
+{
+    rtgChainBegin( 3, "updateHappiness" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition14_updateHappiness( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
 void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
@@ -519,6 +572,9 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                 case 4 /*updateValPort*/:
                     switch( signalIndex )
                     {
+                    case UpdateValProt::Conjugate::rti_updateHappiness:
+                        chain14_updateHappiness(  );
+                        return ;
                     case UpdateValProt::Conjugate::rti_updateHealth:
                         chain8_updateHealth(  );
                         return ;
@@ -569,7 +625,7 @@ const RTActor_class Update_Actor::rtg_class =
     , 3
     , Update_Actor::rtg_parent_state
     , &Update
-    , 3
+    , 4
     , Update_Actor::rtg_capsule_roles
     , 5
     , Update_Actor::rtg_ports
@@ -615,10 +671,23 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 3
+        , 4
         , rtg_interfaces_translateInput
-        , 3
+        , 4
         , rtg_bindings_translateInput
+    }
+    , {
+        "play"
+        , &Play
+        , RTOffsetOf( Update_Actor, play )
+        , 4
+        , RTComponentDescriptor::Fixed
+        , 1
+        , 1
+        , 2
+        , rtg_interfaces_play
+        , 2
+        , rtg_bindings_play
     }
 };
 
@@ -656,7 +725,7 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , nullptr
         , &UpdateValProt::Conjugate::rt_class
         , RTOffsetOf( Update_Actor, updateValPort )
-        , 1
+        , 2
         , 4
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
@@ -763,6 +832,29 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
             {
                 rtg_end.port = &updateOptionsPort;
                 rtg_end.index = rtg_repIndex;
+                return 1;
+            }
+            break;
+        case 3:
+            if( rtg_repIndex < 1 )
+                return play._followIn( rtg_end, 0, rtg_repIndex );
+            break;
+        default:
+            break;
+        }
+        break;
+    case 4:
+        switch( rtg_portId )
+        {
+        case 0:
+            if( rtg_repIndex < 1 )
+                return translateInput._followIn( rtg_end, 3, rtg_repIndex );
+            break;
+        case 1:
+            if( rtg_repIndex < 1 )
+            {
+                rtg_end.port = &updateValPort;
+                rtg_end.index = rtg_repIndex + 1;
                 return 1;
             }
             break;
