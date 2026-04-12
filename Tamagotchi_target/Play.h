@@ -26,6 +26,7 @@ protected:
     INLINE_METHODS void transition4_throws_5( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition5_caught_last( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition6_exit( const void * rtdata, PlayProt::Conjugate * rtport );
+    INLINE_METHODS void transition7_sleep( const void * rtdata, UpdateValProt::Base * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_play_activated( void );
@@ -33,6 +34,8 @@ private:
     INLINE_CHAINS void chain4_throws_5( void );
     INLINE_CHAINS void chain5_caught_last( void );
     INLINE_CHAINS void chain6_exit( void );
+    INLINE_CHAINS void chain7_sleep( void );
+    INLINE_CHAINS void chain8_sleep( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];

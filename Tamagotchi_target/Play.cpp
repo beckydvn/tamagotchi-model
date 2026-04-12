@@ -59,6 +59,13 @@ throwCount = 0;
 //}}}USR
 }
 
+INLINE_METHODS void Play_Actor::transition7_sleep( const void * rtdata, UpdateValProt::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_fNh5EDaTEfGJaL0kWrhu3A
+throwCount = 0;
+//}}}USR
+}
+
 INLINE_CHAINS void Play_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
@@ -119,6 +126,25 @@ INLINE_CHAINS void Play_Actor::chain6_exit( void )
     enterState( 2 );
 }
 
+INLINE_CHAINS void Play_Actor::chain7_sleep( void )
+{
+    rtgChainBegin( 3, "sleep" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition7_sleep( msg->data, static_cast< UpdateValProt::Base * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Play_Actor::chain8_sleep( void )
+{
+    rtgChainBegin( 2, "sleep" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 2 );
+}
+
 void Play_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
@@ -165,6 +191,16 @@ void Play_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
+                case 2 /*updateValPort*/:
+                    switch( signalIndex )
+                    {
+                    case UpdateValProt::Base::rti_resetThrow:
+                        chain8_sleep(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -189,6 +225,16 @@ void Play_Actor::rtsBehavior( int signalIndex, int portIndex )
                         return ;
                     case PlayProt::Conjugate::rti_throwBall:
                         chain3_throwBall(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 2 /*updateValPort*/:
+                    switch( signalIndex )
+                    {
+                    case UpdateValProt::Base::rti_resetThrow:
+                        chain7_sleep(  );
                         return ;
                     default:
                         break;

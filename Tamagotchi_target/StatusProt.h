@@ -19,7 +19,6 @@ struct StatusProt
         };
     public:
         inline RTOutSignal hatch( void );
-        inline RTOutSignal returnToIdle( void );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -32,16 +31,14 @@ struct StatusProt
         enum RTOutEvents
         {
             rti_hatch = rtiLast_RTRootProtocol + 1
-            , rti_returnToIdle
         };
     protected:
         enum
         {
-            rtiLast_StatusProt = rti_returnToIdle
+            rtiLast_StatusProt = rti_hatch
         };
     public:
         inline RTInSignal hatch( void );
-        inline RTInSignal returnToIdle( void );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -61,11 +58,6 @@ inline RTOutSignal StatusProt::Base::hatch( void )
     return RTOutSignal( this, Conjugate::rti_hatch, nullptr, &RTType_void );
 }
 
-inline RTOutSignal StatusProt::Base::returnToIdle( void )
-{
-    return RTOutSignal( this, Conjugate::rti_returnToIdle, nullptr, &RTType_void );
-}
-
 inline StatusProt::Conjugate::Conjugate( void )
     : RTRootProtocol(  )
 {
@@ -78,11 +70,6 @@ inline StatusProt::Conjugate::~Conjugate( void )
 inline RTInSignal StatusProt::Conjugate::hatch( void )
 {
     return RTInSignal( this, rti_hatch );
-}
-
-inline RTInSignal StatusProt::Conjugate::returnToIdle( void )
-{
-    return RTInSignal( this, rti_returnToIdle );
 }
 
 #endif /* StatusProt_h */

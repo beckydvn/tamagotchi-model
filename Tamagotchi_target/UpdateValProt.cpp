@@ -10,13 +10,18 @@ const RTProtocolDescriptor UpdateValProt::Base::rt_class =
     , &UpdateValProt::Conjugate::rt_class
     , "UpdateValProt"
     , 0
-    , 2
+    , 3
     , UpdateValProt::Base::rt_signals
 };
 
 const RTSignalDescriptor UpdateValProt::Base::rt_signals[] =
 {
     {
+        "resetThrow"
+        , &RTType_void
+        , UpdateValProt::Base::rti_resetThrow
+    }
+    , {
         "rtBound"
         , nullptr
         , UpdateValProt::Base::rti_rtBound

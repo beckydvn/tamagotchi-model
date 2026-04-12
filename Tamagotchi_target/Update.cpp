@@ -137,6 +137,15 @@ static const RTBindingDescriptor rtg_bindings_play[] =
     }
 };
 
+static const RTLocalBindingDescriptor rtg_local_bindings[] =
+{
+    {
+        1
+        , 2
+        , 6
+    }
+};
+
 #define SUPER RTActor
 Update_Actor::Update_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
@@ -202,7 +211,6 @@ std::cout<< "\n" << tname << " LOOKS HAPPY TO MEET YOU, " << owner_name << "!" <
 std::cout<< "\nINITIALIZING STATS..." <<std::endl;
 showStatus();
 statusPort.hatch().send();
-timingPort.informIn(RTTimespec(0.5,0));
 //}}}USR
 }
 
@@ -279,10 +287,12 @@ discipline -= 1;
 //}}}USR
 }
 
-INLINE_METHODS void Update_Actor::transition6_timeout( const void * rtdata, Timing::Base * rtport )
+INLINE_METHODS void Update_Actor::transition6_hatch( const void * rtdata, StatusProt::Conjugate * rtport )
 {
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_3dEs4DX8EfGJaL0kWrhu3A
-timingPort.informEvery(RTTimespec(10,0));
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_710E8DaPEfGJaL0kWrhu3A
+sleepTimer = timingUpdateValsPort.informEvery(RTTimespec(updateValTime,0));
+updateValTimer = timingSleepPort.informEvery(RTTimespec(sleepTime,0));
+
 //}}}USR
 }
 
@@ -345,6 +355,19 @@ showStatus();
 //}}}USR
 }
 
+INLINE_METHODS void Update_Actor::transition15_timeout_sleep( const void * rtdata, Timing::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_7MnrEDacEfGJaL0kWrhu3A
+std::cout << "\n" << tama_name << " IS SLEEPING..." << std::endl;
+std::cout << "\n" << tama_name << " IS FEELING ENERGIZED!" << std::endl;
+health += 1;
+happiness += 1;
+hunger += 1;
+updateValPort.resetThrow();
+showStatus();
+//}}}USR
+}
+
 INLINE_CHAINS void Update_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
@@ -353,9 +376,9 @@ INLINE_CHAINS void Update_Actor::chain1_Initial( void )
     enterState( 2 );
 }
 
-INLINE_CHAINS void Update_Actor::chain2_timeout( void )
+INLINE_CHAINS void Update_Actor::chain2_timeout_update_vals( void )
 {
-    rtgChainBegin( 3, "timeout" );
+    rtgChainBegin( 3, "timeout (update vals)" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
@@ -403,12 +426,12 @@ INLINE_CHAINS void Update_Actor::chain5_20_chance( void )
     enterState( 3 );
 }
 
-INLINE_CHAINS void Update_Actor::chain6_timeout( void )
+INLINE_CHAINS void Update_Actor::chain6_hatch( void )
 {
-    rtgChainBegin( 2, "timeout" );
+    rtgChainBegin( 2, "hatch" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
-    transition6_timeout( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
+    transition6_hatch( msg->data, static_cast< StatusProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
@@ -497,6 +520,16 @@ INLINE_CHAINS void Update_Actor::chain14_updateHappiness( void )
     enterState( 3 );
 }
 
+INLINE_CHAINS void Update_Actor::chain15_timeout_sleep( void )
+{
+    rtgChainBegin( 3, "timeout (sleep)" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition15_timeout_sleep( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
 void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
@@ -533,11 +566,11 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 2 /*timingPort*/:
+                case 7 /*statusProtR*/:
                     switch( signalIndex )
                     {
-                    case Timing::Base::rti_timeout:
-                        chain6_timeout(  );
+                    case StatusProt::Conjugate::rti_hatch:
+                        chain6_hatch(  );
                         return ;
                     default:
                         break;
@@ -559,11 +592,11 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 2 /*timingPort*/:
+                case 2 /*timingUpdateValsPort*/:
                     switch( signalIndex )
                     {
                     case Timing::Base::rti_timeout:
-                        chain2_timeout(  );
+                        chain2_timeout_update_vals(  );
                         return ;
                     default:
                         break;
@@ -590,6 +623,16 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                     {
                     case UpdateOptionsProt::Conjugate::rti_updateOptions:
                         chain13_updateOptions(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 6 /*timingSleepPort*/:
+                    switch( signalIndex )
+                    {
+                    case Timing::Base::rti_timeout:
+                        chain15_timeout_sleep(  );
                         return ;
                     default:
                         break;
@@ -627,11 +670,11 @@ const RTActor_class Update_Actor::rtg_class =
     , &Update
     , 4
     , Update_Actor::rtg_capsule_roles
-    , 5
+    , 7
     , Update_Actor::rtg_ports
-    , 0
-    , nullptr
-    , 5
+    , 1
+    , rtg_local_bindings
+    , 9
     , Update_Actor::rtg_Update_Actor_fields
 };
 
@@ -703,10 +746,10 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
     , {
-        "timingPort"
+        "timingUpdateValsPort"
         , nullptr
         , &Timing::Base::rt_class
-        , RTOffsetOf( Update_Actor, timingPort )
+        , RTOffsetOf( Update_Actor, timingUpdateValsPort )
         , 1
         , 2
         , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
@@ -716,7 +759,7 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , nullptr
         , &StatusProt::Base::rt_class
         , RTOffsetOf( Update_Actor, statusPort )
-        , 1
+        , 2
         , 3
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
@@ -736,6 +779,24 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , RTOffsetOf( Update_Actor, updateOptionsPort )
         , 1
         , 5
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "timingSleepPort"
+        , nullptr
+        , &Timing::Base::rt_class
+        , RTOffsetOf( Update_Actor, timingSleepPort )
+        , 1
+        , 6
+        , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "statusProtR"
+        , nullptr
+        , &StatusProt::Conjugate::rt_class
+        , RTOffsetOf( Update_Actor, statusProtR )
+        , 1
+        , 7
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
@@ -772,6 +833,30 @@ const RTFieldDescriptor Update_Actor::rtg_Update_Actor_fields[] =
         , &RTType_int
         , nullptr
     }
+    , {
+        "sleepTime"
+        , RTOffsetOf( Update_Actor, sleepTime )
+        , &RTType_int
+        , nullptr
+    }
+    , {
+        "updateValTime"
+        , RTOffsetOf( Update_Actor, updateValTime )
+        , &RTType_int
+        , nullptr
+    }
+    , {
+        "sleepTimer"
+        , RTOffsetOf( Update_Actor, sleepTimer )
+        , &RTType_RTTimerId
+        , nullptr
+    }
+    , {
+        "updateValTimer"
+        , RTOffsetOf( Update_Actor, updateValTimer )
+        , &RTType_RTTimerId
+        , nullptr
+    }
 };
 
 int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_portId, int rtg_repIndex )
@@ -785,7 +870,7 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
             if( rtg_repIndex < 1 )
             {
                 rtg_end.port = &statusPort;
-                rtg_end.index = rtg_repIndex;
+                rtg_end.index = rtg_repIndex + 1;
                 return 1;
             }
             break;
