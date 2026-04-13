@@ -34,7 +34,7 @@ protected:
     InputProt::Base triggerInputPort;
     ResetPlayProt::Base resetPlayPort;
     UpdateTamaProt::Conjugate updateTamaPort;
-    Timing::Base timingSleepingPort;
+    Timing::Base timingGeneralPort;
     std::string owner_name;
 public:
     std::string tama_name;
@@ -219,20 +219,55 @@ private:
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠇⠀⢸⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢿⣿⣦⣀⠀⠀⠀⠀⢀⣠⣾⣿⠏⠀⠀⠘⢿⣷⣦⣤⣀⣀⣀⣀⣤⣾⣿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢿⣿⣿⣿⣿⣿⢿⠟⠁⠀⠀⠀⠀⠀⠉⠛⠛⠿⠿⠿⠿⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" } ;
-    RTTimerId sleepingTimer;
+    RTTimerId generalTimer;
+    const char* tama_bored { "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣴⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣶⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣾⡿⠿⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠛⠻⠿⣿⣷⣦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠿⣿⣷⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⢀⣼⣿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣴⣤⣠⣀⠀⠀⠀⠀⠀⠉⢻⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⢀⣾⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠻⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⣼⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⢿⣿⣿⠟⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⢰⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣷⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣤⣀⠀⠀\n"
+    "⠀⠀⠀⠀⣿⣿⠁⠀⠀⠀⠀⠀⠀⢀⣶⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠁⠈⠉⠉⠉⠉⠉⠉⠉⠉⠙⠻⢿⣷⡄\n"
+    "⠀⠀⠀⢰⣿⡇⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿\n"
+    "⠀⠀⠀⠸⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣰⣿⡿\n"
+    "⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠒⠤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣠⣤⣴⣾⣿⠿⠋⠀\n"
+    "⠀⠀⠀⠀⣿⣿⡄⠀⠀⠀⠀⠀⢠⠊⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠿⢿⣿⣯⡄⠀⠀⠀\n"
+    "⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢻⣿⡆⠀⠀\n"
+    "⠀⠀⢀⣾⣿⠃⠀⠀⠀⠀⠀⠀⠸⡄⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⡇⠀⠀\n"
+    "⠀⠀⣾⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⢄⠀⠀⢀⠴⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⢀⣀⣀⣀⣠⣤⣶⣿⡿⠟⠀⠀⠀\n"
+    "⠀⣸⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⡿⠿⠿⠿⠿⠟⠛⠋⠁⠀⠀⠀⠀⠀\n"
+    "⢠⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣿⣷⠄⠀⠀⠀⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⣸⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⡏⠀⠀⠀⠀⠀⠀⢻⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡿⠀⠀⠀⠀⠀⠀⠀⣾⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣇⠀⠀⠀⠀⠀⠀⣼⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⡄⠀⠀⠀⢀⣾⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢿⣿⣶⣴⣾⣿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⢹⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠈⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠘⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠘⢿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⡿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠙⢿⣿⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠉⠻⢿⣿⣶⣦⣄⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣾⣿⣿⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⣿⣿⣿⣷⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣤⣤⣴⣶⣶⣾⣿⡿⠿⠛⠋⠘⢿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡿⠀⠀⠉⠉⠉⠉⠉⠉⠉⠉⢿⣿⡍⠉⢻⣿⡏⠉⠁⠀⠀⠀⠀⠀⠀⢸⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠇⠀⢸⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢿⣿⣦⣀⠀⠀⠀⠀⢀⣠⣾⣿⠏⠀⠀⠘⢿⣷⣦⣤⣀⣀⣀⣀⣤⣾⣿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢿⣿⣿⣿⣿⣿⢿⠟⠁⠀⠀⠀⠀⠀⠉⠛⠛⠿⠿⠿⠿⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" } ;
 public:
     void showStatus( void );
 protected:
     INLINE_METHODS void enter2_Hatch( void );
     virtual void enterStateV( void ) override;
     INLINE_METHODS void enter4_Sleep( void );
+    INLINE_METHODS void enter5_Pause( void );
     INLINE_METHODS void transition2_timeout_update_vals( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS int guard3_inc_hunger_50_chance( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS void transition3_inc_hunger_50_chance( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS int guard4_dec_happiness_30_chance( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS void transition4_dec_happiness_30_chance( const void * rtdata, Timing::Base * rtport );
-    INLINE_METHODS int guard5_20_chance( const void * rtdata, Timing::Base * rtport );
-    INLINE_METHODS void transition5_20_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS int guard5_dec_discipline_20_chance( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition5_dec_discipline_20_chance( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS void transition6_hatch( const void * rtdata, StatusProt::Conjugate * rtport );
     INLINE_METHODS void transition7_updateHunger( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition8_updateHealth( const int * rtdata, UpdateValProt::Conjugate * rtport );
@@ -240,17 +275,19 @@ protected:
     INLINE_METHODS void transition9_is_full( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS int guard11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition11_ill( const int * rtdata, UpdateValProt::Conjugate * rtport );
+    INLINE_METHODS void transition12_else( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition13_updateOptions( const void * rtdata, UpdateOptionsProt::Conjugate * rtport );
     INLINE_METHODS void transition14_updateHappiness( const int * rtdata, UpdateValProt::Conjugate * rtport );
     INLINE_METHODS void transition15_timeout_sleep( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS void transition16_updateTama( const void * rtdata, UpdateTamaProt::Conjugate * rtport );
     INLINE_METHODS void transition18_timeout( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition19_timeout( const void * rtdata, Timing::Base * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_timeout_update_vals( void );
     INLINE_CHAINS void chain3_inc_hunger_50_chance( void );
     INLINE_CHAINS void chain4_dec_happiness_30_chance( void );
-    INLINE_CHAINS void chain5_20_chance( void );
+    INLINE_CHAINS void chain5_dec_discipline_20_chance( void );
     INLINE_CHAINS void chain6_hatch( void );
     INLINE_CHAINS void chain7_updateHunger( void );
     INLINE_CHAINS void chain8_updateHealth( void );
@@ -264,6 +301,7 @@ private:
     INLINE_CHAINS void chain16_updateTama( void );
     INLINE_CHAINS void chain17_ignore_timeout_update_vals( void );
     INLINE_CHAINS void chain18_timeout( void );
+    INLINE_CHAINS void chain19_timeout( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];
