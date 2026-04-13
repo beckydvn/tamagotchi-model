@@ -19,6 +19,7 @@ static const char * const rtg_state_names[] =
     "<machine>"
     , "Hatch"
     , "Idle"
+    , "Sleep"
     , "RNGVal"
     , ""
     , ""
@@ -206,8 +207,10 @@ void Update_Actor::showStatus( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_mW9aQDRsEfGs993j7RVgLQ
 std::cout<< "\n-----------------------------------------------------------------------" <<std::endl;
-std::cout<< tama_name << " STATUS:\n" << "\nHUNGER: " << hunger << "\nHAPPINESS: " << happiness << "\nDISCIPLINE: " << discipline << "\nHEALTH: " << health <<std::endl;
+std::cout<< tama_name << " STATUS:\n" << "\nHUNGER: " << hunger << "\nHAPPINESS: " << happiness << "\nDISCIPLINE: " << discipline << "\nHEALTH: " << health << "\n" << tama <<std::endl;
 std::cout<< "-----------------------------------------------------------------------" <<std::endl;
+std::cout << "\nWHAT WILL " << owner_name << " DO?" << options << std::endl;
+triggerInputPort.triggerInput().send();
 //}}}USR
 }
 
@@ -222,9 +225,9 @@ RTActorId inputThread = frameP.incarnate(input, noData, InputLogical);
 if (!inputThread.isValid())
 	context()->perror("[Status] incarnation failed!");
 
-std::cout<< "YOUR TAMAGOTCHI HAS HATCHED!" <<std::endl;
+std::cout<< "\nYOUR TAMAGOTCHI HAS HATCHED!" <<std::endl;
 
-std::cout<< "PLEASE ENTER THE NAME YOU WOULD LIKE TO GIVE YOUR TAMAGOTCHI:" <<std::endl;
+std::cout<< "\nPLEASE ENTER THE NAME YOU WOULD LIKE TO GIVE YOUR TAMAGOTCHI:" <<std::endl;
 
 char tname[256];
 
@@ -239,7 +242,7 @@ for (int i = 0; tname[i]; i++) {
 
 tama_name = tname;
 
-std::cout<< "AND WHAT IS YOUR NAME?" <<std::endl;
+std::cout<< "\nAND WHAT IS YOUR NAME?" <<std::endl;
 
 char oname[256];
 
@@ -255,10 +258,10 @@ for (int i = 0; oname[i]; i++) {
 owner_name = oname;
 
 std::cout<< "\n" << tname << " LOOKS HAPPY TO MEET YOU, " << owner_name << "!" <<std::endl;
-
+statusPort.hatch().send();
 std::cout<< "\nINITIALIZING STATS..." <<std::endl;
 showStatus();
-statusPort.hatch().send();
+
 //}}}USR
 }
 
@@ -269,8 +272,8 @@ void Update_Actor::enterStateV( void )
     case 2:
         enter2_Hatch(  );
         break;
-    case 3:
-        enter3_Idle(  );
+    case 4:
+        enter4_Sleep(  );
         break;
     default:
         RTActor::enterStateV(  );
@@ -278,12 +281,17 @@ void Update_Actor::enterStateV( void )
     }
 }
 
-INLINE_METHODS void Update_Actor::enter3_Idle( void )
+INLINE_METHODS void Update_Actor::enter4_Sleep( void )
 {
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_7GC-sDX8EfGJaL0kWrhu3A
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_ET0MYDbaEfGJaL0kWrhu3A
+sleepingTimer = timingSleepingPort.informIn(RTTimespec(3,0));
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition2_timeout_update_vals( const void * rtdata, Timing::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_JVtHADbcEfGJaL0kWrhu3A
 rng = (rand() % 100);
-std::cout << tama << "\nWHAT WILL " << owner_name << " DO?" << options << std::endl;
-triggerInputPort.triggerInput().send();
 //}}}USR
 }
 
@@ -299,6 +307,7 @@ INLINE_METHODS void Update_Actor::transition3_inc_hunger_50_chance( const void *
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_nHuvwDX0EfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING HUNGRY..." <<std::endl;
 hunger += 1;
+showStatus();
 //}}}USR
 }
 
@@ -314,6 +323,7 @@ INLINE_METHODS void Update_Actor::transition4_dec_happiness_30_chance( const voi
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_rfzjQDX0EfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING BORED..." <<std::endl;
 happiness -= 1;
+showStatus();
 //}}}USR
 }
 
@@ -329,6 +339,7 @@ INLINE_METHODS void Update_Actor::transition5_20_chance( const void * rtdata, Ti
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_8hdGYDX0EfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING ROWDY..." <<std::endl;
 discipline -= 1;
+showStatus();
 //}}}USR
 }
 
@@ -404,12 +415,8 @@ INLINE_METHODS void Update_Actor::transition15_timeout_sleep( const void * rtdat
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_7MnrEDacEfGJaL0kWrhu3A
 std::cout << "\n" << tama_name << " IS SLEEPING..." << std::endl;
-std::cout << "\n" << tama_name << " IS FEELING ENERGIZED!" << std::endl;
-health += 1;
-happiness += 1;
-hunger += 1;
-resetPlayPort.resetThrow().send();
-showStatus();
+tama = tama_sleep;
+std::cout << "\n" << tama << std::endl;
 //}}}USR
 }
 
@@ -417,6 +424,22 @@ INLINE_METHODS void Update_Actor::transition16_updateTama( const void * rtdata, 
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_iSg3wDa5EfGJaL0kWrhu3A
 tama = (const char *)rtdata;
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition18_timeout( const void * rtdata, Timing::Base * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_OyX18DbaEfGJaL0kWrhu3A
+std::cout << "\n" << tama_name << " WOKE UP AND IS FEELING ENERGIZED!" << std::endl;
+tama = tama_happy;
+health += 1;
+happiness += 1;
+hunger += 1;
+resetPlayPort.resetThrow().send();
+if(sleepingTimer.isValid()){
+	timingSleepingPort.cancelTimer(sleepingTimer);
+}
+showStatus();
 //}}}USR
 }
 
@@ -433,6 +456,7 @@ INLINE_CHAINS void Update_Actor::chain2_timeout_update_vals( void )
     rtgChainBegin( 3, "timeout (update vals)" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
+    transition2_timeout_update_vals( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     if( guard3_inc_hunger_50_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) ) )
     {
@@ -453,7 +477,7 @@ INLINE_CHAINS void Update_Actor::chain2_timeout_update_vals( void )
 
 INLINE_CHAINS void Update_Actor::chain3_inc_hunger_50_chance( void )
 {
-    rtgChainBegin( 4, "inc hunger (50% chance)" );
+    rtgChainBegin( 5, "inc hunger (50% chance)" );
     rtgTransitionBegin(  );
     transition3_inc_hunger_50_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
@@ -462,7 +486,7 @@ INLINE_CHAINS void Update_Actor::chain3_inc_hunger_50_chance( void )
 
 INLINE_CHAINS void Update_Actor::chain4_dec_happiness_30_chance( void )
 {
-    rtgChainBegin( 4, "dec happiness (30% chance)" );
+    rtgChainBegin( 5, "dec happiness (30% chance)" );
     rtgTransitionBegin(  );
     transition4_dec_happiness_30_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
@@ -471,7 +495,7 @@ INLINE_CHAINS void Update_Actor::chain4_dec_happiness_30_chance( void )
 
 INLINE_CHAINS void Update_Actor::chain5_20_chance( void )
 {
-    rtgChainBegin( 4, "20% chance" );
+    rtgChainBegin( 5, "20% chance" );
     rtgTransitionBegin(  );
     transition5_20_chance( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
@@ -520,7 +544,7 @@ INLINE_CHAINS void Update_Actor::chain8_updateHealth( void )
 
 INLINE_CHAINS void Update_Actor::chain9_is_full( void )
 {
-    rtgChainBegin( 5, "is full" );
+    rtgChainBegin( 6, "is full" );
     rtgTransitionBegin(  );
     transition9_is_full( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
@@ -529,7 +553,7 @@ INLINE_CHAINS void Update_Actor::chain9_is_full( void )
 
 INLINE_CHAINS void Update_Actor::chain10_else( void )
 {
-    rtgChainBegin( 5, "else" );
+    rtgChainBegin( 6, "else" );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 3 );
@@ -537,7 +561,7 @@ INLINE_CHAINS void Update_Actor::chain10_else( void )
 
 INLINE_CHAINS void Update_Actor::chain11_ill( void )
 {
-    rtgChainBegin( 6, "ill" );
+    rtgChainBegin( 7, "ill" );
     rtgTransitionBegin(  );
     transition11_ill( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
@@ -546,7 +570,7 @@ INLINE_CHAINS void Update_Actor::chain11_ill( void )
 
 INLINE_CHAINS void Update_Actor::chain12_else( void )
 {
-    rtgChainBegin( 6, "else" );
+    rtgChainBegin( 7, "else" );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 3 );
@@ -579,7 +603,7 @@ INLINE_CHAINS void Update_Actor::chain15_timeout_sleep( void )
     rtgTransitionBegin(  );
     transition15_timeout_sleep( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
-    enterState( 3 );
+    enterState( 4 );
 }
 
 INLINE_CHAINS void Update_Actor::chain16_updateTama( void )
@@ -588,6 +612,25 @@ INLINE_CHAINS void Update_Actor::chain16_updateTama( void )
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     transition16_updateTama( msg->data, static_cast< UpdateTamaProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Update_Actor::chain17_ignore_timeout_update_vals( void )
+{
+    rtgChainBegin( 4, "ignore timeout (update vals)" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 4 );
+}
+
+INLINE_CHAINS void Update_Actor::chain18_timeout( void )
+{
+    rtgChainBegin( 4, "timeout" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition18_timeout( msg->data, static_cast< Timing::Base * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
@@ -714,6 +757,42 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                     break;
                 }
                 break;
+            case 4 /* Sleep (State Machine::Sleep) */:
+                switch( portIndex )
+                {
+                case 0 /*RTControlPort*/:
+                    switch( signalIndex )
+                    {
+                    case 1 /*RTInitSignal*/:
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 2 /*timingUpdateValsPort*/:
+                    switch( signalIndex )
+                    {
+                    case Timing::Base::rti_timeout:
+                        chain17_ignore_timeout_update_vals(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 11 /*timingSleepingPort*/:
+                    switch( signalIndex )
+                    {
+                    case Timing::Base::rti_timeout:
+                        chain18_timeout(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                break;
             default:
                 unexpectedState(  );
                 return ;
@@ -724,6 +803,7 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
 const RTStateId Update_Actor::rtg_parent_state[] =
 {
     0
+    , 1
     , 1
     , 1
 };
@@ -737,16 +817,16 @@ const RTActor_class Update_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
-    , 3
+    , 4
     , Update_Actor::rtg_parent_state
     , &Update
     , 4
     , Update_Actor::rtg_capsule_roles
-    , 10
+    , 11
     , Update_Actor::rtg_ports
     , 1
     , rtg_local_bindings
-    , 10
+    , 11
     , Update_Actor::rtg_Update_Actor_fields
 };
 
@@ -898,6 +978,15 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , 10
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
+    , {
+        "timingSleepingPort"
+        , nullptr
+        , &Timing::Base::rt_class
+        , RTOffsetOf( Update_Actor, timingSleepingPort )
+        , 1
+        , 11
+        , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
 };
 
 const RTFieldDescriptor Update_Actor::rtg_Update_Actor_fields[] =
@@ -961,6 +1050,12 @@ const RTFieldDescriptor Update_Actor::rtg_Update_Actor_fields[] =
         , RTOffsetOf( Update_Actor, tama )
         , &RTType_char
         , &rtg_tm_Update_Actor_tama
+    }
+    , {
+        "sleepingTimer"
+        , RTOffsetOf( Update_Actor, sleepingTimer )
+        , &RTType_RTTimerId
+        , nullptr
     }
 };
 

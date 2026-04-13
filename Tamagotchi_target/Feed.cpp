@@ -45,7 +45,6 @@ void Feed_Actor::enterStateV( void )
 INLINE_METHODS void Feed_Actor::transition3_getSnack( const void * rtdata, FeedProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_UGBWMDXwEfGJaL0kWrhu3A
-std::cout<< "\nATE THE SNACK..." <<std::endl;
 snackCount += 1;
 //}}}USR
 }
@@ -61,6 +60,7 @@ INLINE_METHODS void Feed_Actor::transition4_snackCount_3( const void * rtdata, F
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_AJn4MDX7EfGJaL0kWrhu3A
 updateValPort.updateHunger(-2).send();
+std::cout<< "\nATE THE SNACK..." <<std::endl;
 //}}}USR
 }
 
@@ -74,17 +74,19 @@ return (snackCount >= 3);
 INLINE_METHODS void Feed_Actor::transition5_else( const void * rtdata, FeedProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_EMqP0DX7EfGJaL0kWrhu3A
-std::cout<< "\nSO...MANY...SNACKS..." <<std::endl;
 updateValPort.updateHunger(-1).send();
 updateValPort.updateHealth(-3).send();
+std::cout<< "\nSO...MANY...SNACKS..." <<std::endl;
+
 //}}}USR
 }
 
 INLINE_METHODS void Feed_Actor::transition6_getMeal( const void * rtdata, FeedProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_wAme0DX9EfGJaL0kWrhu3A
-std::cout<< "\nATE THE MEAL..." <<std::endl;
 updateValPort.updateHunger(3).send();
+std::cout<< "\nATE THE MEAL..." <<std::endl;
+
 //}}}USR
 }
 
