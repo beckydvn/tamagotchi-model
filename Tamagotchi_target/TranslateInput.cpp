@@ -56,6 +56,11 @@ if(mode == "IDLE"){
 		playPort.initPlay().send();
 		mode = "PLAY";
 	}
+	else if(input == "TRAIN"){
+		updateOptionsPort.updateOptions(trainOptions).send();
+		disciplinePort.initPlay().send();
+		mode = "TRAIN";
+	}
 }
 else if(mode == "FEED"){
 	if(input == "SNACK"){
@@ -80,6 +85,14 @@ else if(mode == "PLAY"){
 	}
 	else if(input == "EXIT"){
 		playPort.exit().send();
+		updateOptionsPort.updateOptions(idleOptions).send();
+		updateTamaPort.updateTama(tama_happy).send();
+		mode = "IDLE";
+	}
+}
+else if(mode == "TRAIN"){
+	if(input == "EXIT"){
+		disciplinePort.exit().send();
 		updateOptionsPort.updateOptions(idleOptions).send();
 		updateTamaPort.updateTama(tama_happy).send();
 		mode = "IDLE";

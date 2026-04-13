@@ -353,7 +353,7 @@ INLINE_METHODS void Update_Actor::transition5_dec_discipline_20_chance( const vo
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_8hdGYDX0EfGJaL0kWrhu3A
 std::cout<< "\n" << tama_name << " IS GETTING ROWDY..." <<std::endl;
-discipline -= 1;
+disc -= 1;
 tama = tama_angry;
 std::cout << "\n" << tama << std::endl;
 //}}}USR
