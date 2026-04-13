@@ -24,6 +24,7 @@ protected:
     RTActorRef feed;
     RTActorRef translateInput;
     RTActorRef play;
+    RTActorRef discipline;
     Frame::Base frameP;
     Timing::Base timingUpdateValsPort;
     StatusProt::Base statusPort;
@@ -40,11 +41,11 @@ public:
     std::string tama_name;
 private:
     int hunger { 5 } ;
-    int discipline { 5 } ;
+    int disc { 5 } ;
     int happiness { 5 } ;
     int health { 5 } ;
     int rng { 0 } ;
-    std::string options { "\nACTIVITY OPTIONS: (FEED, PLAY)"  } ;
+    std::string options { "\nACTIVITY OPTIONS: (FEED, PLAY, TRAIN)"  } ;
     int sleepTime { 20 } ;
     int updateValTime { 10 } ;
     RTTimerId sleepTimer;

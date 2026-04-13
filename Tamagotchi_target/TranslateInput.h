@@ -5,6 +5,7 @@
 #pragma interface "TranslateInput.h"
 #endif
 #include <UnitName.h>
+#include <DisciplineProt.h>
 #include <FeedProt.h>
 #include <InputProt.h>
 #include <PlayProt.h>
@@ -24,6 +25,7 @@ protected:
     UpdateOptionsProt::Base updateOptionsPort;
     PlayProt::Base playPort;
     UpdateTamaProt::Base updateTamaPort;
+    DisciplineProt::Base disciplinePort;
 private:
     const char* tama_happy { "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣴⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣶⣤⣄⣀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣾⡿⠿⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠛⠻⠿⣿⣷⣦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
@@ -164,8 +166,9 @@ private:
     std::string input;
     std::string mode { "IDLE" } ;
     const char* feedOptions { "\nFEED OPTIONS: (SNACK, MEAL, EXIT)" } ;
-    const char* idleOptions { "\nACTIVITY OPTIONS: (FEED, PLAY)" } ;
+    const char* idleOptions { "\nACTIVITY OPTIONS: (FEED, PLAY, TRAIN)" } ;
     const char* playOptions { "\nPLAY OPTIONS: (FETCH, EXIT)" } ;
+    const char* trainOptions { "\nTRAIN OPTIONS: (EXIT)" } ;
 protected:
     INLINE_METHODS void enter3_Send_Signals( void );
     virtual void enterStateV( void ) override;

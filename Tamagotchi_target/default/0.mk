@@ -20,6 +20,8 @@
 0_USER_OBJS_LIST = $(0_USER_OBJS)
 
 0_OBJS = \
+	Discipline$(OBJ_EXT)\
+	DisciplineProt$(OBJ_EXT)\
 	Feed$(OBJ_EXT)\
 	FeedProt$(OBJ_EXT)\
 	InputLoop$(OBJ_EXT)\
@@ -37,6 +39,8 @@
 0_OBJS_LIST = $(0_OBJS)
 0_OBJS_LISTFILE = .olist
 0_DEPFILES = \
+	Discipline$(DEP_EXT)\
+	DisciplineProt$(DEP_EXT)\
 	Feed$(DEP_EXT)\
 	FeedProt$(DEP_EXT)\
 	InputLoop$(DEP_EXT)\
@@ -106,6 +110,14 @@ $(QUANTIFY_TARGET) : $(0_OBJS) $(0_USER_OBJS) $(0_LIBS_DEPS) $(0_OBJS_LISTFILE) 
 	$(QUANTIFY) $(0_LD) $(LD_HEAD) $(0_LDFLAGS) $(0_OBJS_LIST) $(0_USER_OBJS_LIST) $(0_LIBS) $(0_USER_LIBS) $(LD_TAIL)
 	@$(FEEDBACK) Finished building $@
 
+Discipline$(OBJ_EXT) : ../Discipline.cpp ../UnitName.h ../Discipline.h ../DisciplineProt.h ../InputProt.h ../UpdateValProt.h .cc.dat
+	@$(FEEDBACK) Compiling Tamagotchi_target:Discipline
+	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Discipline.cpp $(CC_TAIL)
+
+DisciplineProt$(OBJ_EXT) : ../DisciplineProt.cpp ../UnitName.h ../DisciplineProt.h .cc.dat
+	@$(FEEDBACK) Compiling Tamagotchi_target:DisciplineProt
+	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../DisciplineProt.cpp $(CC_TAIL)
+
 Feed$(OBJ_EXT) : ../Feed.cpp ../UnitName.h ../Feed.h ../FeedProt.h ../InputProt.h ../UpdateValProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:Feed
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Feed.cpp $(CC_TAIL)
@@ -138,7 +150,7 @@ StatusProt$(OBJ_EXT) : ../StatusProt.cpp ../UnitName.h ../StatusProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:StatusProt
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../StatusProt.cpp $(CC_TAIL)
 
-TranslateInput$(OBJ_EXT) : ../TranslateInput.cpp ../UnitName.h ../TranslateInput.h ../FeedProt.h ../InputProt.h ../PlayProt.h ../UpdateOptionsProt.h ../UpdateTamaProt.h .cc.dat
+TranslateInput$(OBJ_EXT) : ../TranslateInput.cpp ../UnitName.h ../TranslateInput.h ../DisciplineProt.h ../FeedProt.h ../InputProt.h ../PlayProt.h ../UpdateOptionsProt.h ../UpdateTamaProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:TranslateInput
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../TranslateInput.cpp $(CC_TAIL)
 
@@ -146,7 +158,7 @@ UnitName$(OBJ_EXT) : ../UnitName.cpp ../UnitName.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:UnitName
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../UnitName.cpp $(CC_TAIL)
 
-Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../InputProt.h ../ResetPlayProt.h ../StatusProt.h ../UpdateOptionsProt.h ../UpdateTamaProt.h ../UpdateValProt.h ../FeedProt.h ../PlayProt.h .cc.dat
+Update$(OBJ_EXT) : ../Update.cpp ../UnitName.h ../Update.h ../InputProt.h ../ResetPlayProt.h ../StatusProt.h ../UpdateOptionsProt.h ../UpdateTamaProt.h ../UpdateValProt.h ../DisciplineProt.h ../FeedProt.h ../PlayProt.h .cc.dat
 	@$(FEEDBACK) Compiling Tamagotchi_target:Update
 	$(0_CC) $(CC_HEAD) $(0_CCFLAGS) $(0_INCPATHS) ../Update.cpp $(CC_TAIL)
 
@@ -165,12 +177,14 @@ UpdateValProt$(OBJ_EXT) : ../UpdateValProt.cpp ../UnitName.h ../UpdateValProt.h 
 0_clean :
 	@$(ECHO) Cleaning Tamagotchi_target
 	$(RMF) executable$(EXEC_EXT)
-	$(RMF) Feed$(OBJ_EXT) FeedProt$(OBJ_EXT) InputLoop$(OBJ_EXT) InputProt$(OBJ_EXT) Play$(OBJ_EXT)
-	$(RMF) PlayProt$(OBJ_EXT) ResetPlayProt$(OBJ_EXT) StatusProt$(OBJ_EXT) TranslateInput$(OBJ_EXT) UnitName$(OBJ_EXT)
-	$(RMF) Update$(OBJ_EXT) UpdateOptionsProt$(OBJ_EXT) UpdateTamaProt$(OBJ_EXT) UpdateValProt$(OBJ_EXT)
-	$(RMF) Feed$(DEP_EXT) FeedProt$(DEP_EXT) InputLoop$(DEP_EXT) InputProt$(DEP_EXT) Play$(DEP_EXT)
-	$(RMF) PlayProt$(DEP_EXT) ResetPlayProt$(DEP_EXT) StatusProt$(DEP_EXT) TranslateInput$(DEP_EXT) UnitName$(DEP_EXT)
-	$(RMF) Update$(DEP_EXT) UpdateOptionsProt$(DEP_EXT) UpdateTamaProt$(DEP_EXT) UpdateValProt$(DEP_EXT)
+	$(RMF) Discipline$(OBJ_EXT) DisciplineProt$(OBJ_EXT) Feed$(OBJ_EXT) FeedProt$(OBJ_EXT) InputLoop$(OBJ_EXT)
+	$(RMF) InputProt$(OBJ_EXT) Play$(OBJ_EXT) PlayProt$(OBJ_EXT) ResetPlayProt$(OBJ_EXT) StatusProt$(OBJ_EXT)
+	$(RMF) TranslateInput$(OBJ_EXT) UnitName$(OBJ_EXT) Update$(OBJ_EXT) UpdateOptionsProt$(OBJ_EXT) UpdateTamaProt$(OBJ_EXT)
+	$(RMF) UpdateValProt$(OBJ_EXT)
+	$(RMF) Discipline$(DEP_EXT) DisciplineProt$(DEP_EXT) Feed$(DEP_EXT) FeedProt$(DEP_EXT) InputLoop$(DEP_EXT)
+	$(RMF) InputProt$(DEP_EXT) Play$(DEP_EXT) PlayProt$(DEP_EXT) ResetPlayProt$(DEP_EXT) StatusProt$(DEP_EXT)
+	$(RMF) TranslateInput$(DEP_EXT) UnitName$(DEP_EXT) Update$(DEP_EXT) UpdateOptionsProt$(DEP_EXT) UpdateTamaProt$(DEP_EXT)
+	$(RMF) UpdateValProt$(DEP_EXT)
 	$(RMF) $(PURECOV_TARGET)
 	$(RMF) $(PURIFY_TARGET)
 	$(RMF) $(PURIFY_COV_TARGET)

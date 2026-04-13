@@ -32,6 +32,13 @@ static const RTTypeModifier rtg_tm_TranslateInput_Actor_playOptions =
     , 1
 };
 
+static const RTTypeModifier rtg_tm_TranslateInput_Actor_trainOptions =
+{
+    RTNumberConstant
+    , 1
+    , 1
+};
+
 #define SUPER RTActor
 TranslateInput_Actor::TranslateInput_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
@@ -58,7 +65,7 @@ if(mode == "IDLE"){
 	}
 	else if(input == "TRAIN"){
 		updateOptionsPort.updateOptions(trainOptions).send();
-		disciplinePort.initPlay().send();
+		disciplinePort.initDiscipline().send();
 		mode = "TRAIN";
 	}
 }
@@ -262,11 +269,11 @@ const RTActor_class TranslateInput_Actor::rtg_class =
     , &TranslateInput
     , 0
     , nullptr
-    , 5
+    , 6
     , TranslateInput_Actor::rtg_ports
     , 0
     , nullptr
-    , 3
+    , 4
     , TranslateInput_Actor::rtg_TranslateInput_Actor_fields
 };
 
@@ -317,6 +324,15 @@ const RTPortDescriptor TranslateInput_Actor::rtg_ports[] =
         , 5
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
+    , {
+        "disciplinePort"
+        , nullptr
+        , &DisciplineProt::Base::rt_class
+        , RTOffsetOf( TranslateInput_Actor, disciplinePort )
+        , 1
+        , 6
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
 };
 
 const RTFieldDescriptor TranslateInput_Actor::rtg_TranslateInput_Actor_fields[] =
@@ -338,6 +354,12 @@ const RTFieldDescriptor TranslateInput_Actor::rtg_TranslateInput_Actor_fields[] 
         , RTOffsetOf( TranslateInput_Actor, playOptions )
         , &RTType_char
         , &rtg_tm_TranslateInput_Actor_playOptions
+    }
+    , {
+        "trainOptions"
+        , RTOffsetOf( TranslateInput_Actor, trainOptions )
+        , &RTType_char
+        , &rtg_tm_TranslateInput_Actor_trainOptions
     }
 };
 
@@ -385,6 +407,14 @@ int TranslateInput_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, in
             return 1;
         }
         break;
+    case 5:
+        if( rtg_repIndex < 1 )
+        {
+            rtg_end.port = &disciplinePort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
     default:
         break;
     }
@@ -419,6 +449,11 @@ static const RTRelayDescriptor rtg_relays[] =
         , &UpdateTamaProt::Base::rt_class
         , 1
     }
+    , {
+        "disciplinePort"
+        , &DisciplineProt::Base::rt_class
+        , 1
+    }
 };
 
 static RTActor * new_TranslateInput_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
@@ -431,7 +466,7 @@ const RTActorClass TranslateInput =
     nullptr
     , "TranslateInput"
     , 0 /*RTVersionId*/
-    , 5
+    , 6
     , rtg_relays
     , new_TranslateInput_Actor
 };

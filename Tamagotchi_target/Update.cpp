@@ -3,8 +3,11 @@
 #endif
 #include <UnitName.h>
 #include <Update.h>
+#include <DisciplineProt.h>
 #include <FeedProt.h>
 #include <PlayProt.h>
+
+extern const RTActorClass Discipline;
 
 extern const RTActorClass Feed;
 
@@ -39,7 +42,7 @@ static const RTInterfaceDescriptor rtg_interfaces_input[] =
     }
     , {
         "triggerInputPort"
-        , 3
+        , 4
     }
 };
 
@@ -113,6 +116,10 @@ static const RTInterfaceDescriptor rtg_interfaces_translateInput[] =
         "updateTamaPort"
         , 1
     }
+    , {
+        "disciplinePort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_translateInput[] =
@@ -136,6 +143,10 @@ static const RTBindingDescriptor rtg_bindings_translateInput[] =
     , {
         4
         , &UpdateTamaProt::Conjugate::rt_class
+    }
+    , {
+        5
+        , &DisciplineProt::Conjugate::rt_class
     }
 };
 
@@ -179,6 +190,38 @@ static const RTBindingDescriptor rtg_bindings_play[] =
     }
 };
 
+static const RTInterfaceDescriptor rtg_interfaces_discipline[] =
+{
+    {
+        "triggerInputPort"
+        , 1
+    }
+    , {
+        "updateValPort"
+        , 1
+    }
+    , {
+        "disciplinePort"
+        , 1
+    }
+};
+
+static const RTBindingDescriptor rtg_bindings_discipline[] =
+{
+    {
+        0
+        , &InputProt::Conjugate::rt_class
+    }
+    , {
+        1
+        , &UpdateValProt::Conjugate::rt_class
+    }
+    , {
+        2
+        , &DisciplineProt::Base::rt_class
+    }
+};
+
 static const RTLocalBindingDescriptor rtg_local_bindings[] =
 {
     {
@@ -209,7 +252,7 @@ void Update_Actor::showStatus( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_mW9aQDRsEfGs993j7RVgLQ
 std::cout<< "\n-----------------------------------------------------------------------" <<std::endl;
-std::cout<< tama_name << " STATUS:\n" << "\nHUNGER: " << hunger << "\nHAPPINESS: " << happiness << "\nDISCIPLINE: " << discipline << "\nHEALTH: " << health << "\n" << tama <<std::endl;
+std::cout<< tama_name << " STATUS:\n" << "\nHUNGER: " << hunger << "\nHAPPINESS: " << happiness << "\nDISCIPLINE: " << disc << "\nHEALTH: " << health << "\n" << tama <<std::endl;
 std::cout<< "-----------------------------------------------------------------------" <<std::endl;
 std::cout << "\nWHAT WILL " << owner_name << " DO?" << options << std::endl;
 triggerInputPort.triggerInput().send();
@@ -888,7 +931,7 @@ const RTActor_class Update_Actor::rtg_class =
     , 5
     , Update_Actor::rtg_parent_state
     , &Update
-    , 4
+    , 5
     , Update_Actor::rtg_capsule_roles
     , 11
     , Update_Actor::rtg_ports
@@ -934,9 +977,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 5
+        , 6
         , rtg_interfaces_translateInput
-        , 5
+        , 6
         , rtg_bindings_translateInput
     }
     , {
@@ -951,6 +994,19 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , rtg_interfaces_play
         , 4
         , rtg_bindings_play
+    }
+    , {
+        "discipline"
+        , &Discipline
+        , RTOffsetOf( Update_Actor, discipline )
+        , 5
+        , RTComponentDescriptor::Fixed
+        , 1
+        , 1
+        , 3
+        , rtg_interfaces_discipline
+        , 3
+        , rtg_bindings_discipline
     }
 };
 
@@ -988,7 +1044,7 @@ const RTPortDescriptor Update_Actor::rtg_ports[] =
         , nullptr
         , &UpdateValProt::Conjugate::rt_class
         , RTOffsetOf( Update_Actor, updateValPort )
-        , 2
+        , 3
         , 4
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
@@ -1066,8 +1122,8 @@ const RTFieldDescriptor Update_Actor::rtg_Update_Actor_fields[] =
         , nullptr
     }
     , {
-        "discipline"
-        , RTOffsetOf( Update_Actor, discipline )
+        "disc"
+        , RTOffsetOf( Update_Actor, disc )
         , &RTType_int
         , nullptr
     }
@@ -1157,6 +1213,8 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
                 return feed._followIn( rtg_end, 2, rtg_repIndex - 1 );
             if( rtg_repIndex < 3 )
                 return play._followIn( rtg_end, 2, rtg_repIndex - 2 );
+            if( rtg_repIndex < 4 )
+                return discipline._followIn( rtg_end, 0, rtg_repIndex - 3 );
             break;
         default:
             break;
@@ -1216,6 +1274,10 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
                 return 1;
             }
             break;
+        case 5:
+            if( rtg_repIndex < 1 )
+                return discipline._followIn( rtg_end, 2, rtg_repIndex );
+            break;
         default:
             break;
         }
@@ -1246,6 +1308,29 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
                 rtg_end.index = rtg_repIndex;
                 return 1;
             }
+            break;
+        default:
+            break;
+        }
+        break;
+    case 5:
+        switch( rtg_portId )
+        {
+        case 0:
+            if( rtg_repIndex < 1 )
+                return input._followIn( rtg_end, 2, rtg_repIndex + 3 );
+            break;
+        case 1:
+            if( rtg_repIndex < 1 )
+            {
+                rtg_end.port = &updateValPort;
+                rtg_end.index = rtg_repIndex + 2;
+                return 1;
+            }
+            break;
+        case 2:
+            if( rtg_repIndex < 1 )
+                return translateInput._followIn( rtg_end, 5, rtg_repIndex );
             break;
         default:
             break;

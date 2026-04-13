@@ -1,48 +1,39 @@
 #if defined( PRAGMA ) && ! defined( PRAGMA_IMPLEMENTED )
-#pragma implementation "InputLoop.h"
+#pragma implementation "Discipline.h"
 #endif
 #include <UnitName.h>
-#include <InputLoop.h>
+#include <Discipline.h>
 
 static const char * const rtg_state_names[] =
 {
     "<machine>"
     , "Start"
-    , "Take Input"
+    , "Initiate Discipline"
 };
 
 #define SUPER RTActor
-InputLoop_Actor::InputLoop_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+Discipline_Actor::Discipline_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
 {
 }
 
-InputLoop_Actor::~InputLoop_Actor( void )
+Discipline_Actor::~Discipline_Actor( void )
 {
 }
 
-INLINE_METHODS void InputLoop_Actor::enter3_Take_Input( void )
+INLINE_METHODS void Discipline_Actor::enter3_Initiate_Discipline( void )
 {
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Z0mKADUpEfGJaL0kWrhu3A
-char userInput[256];
-fgets(userInput, sizeof(userInput), stdin);
-
-userInput[strcspn(userInput, "\n")] = '\0';
-
-for (int i = 0; userInput[i]; i++) {
-		userInput[i] = toupper(userInput[i]);
-}
-
-inputPort.gotInput(userInput).send();
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_CuE4cDbsEfGJaL0kWrhu3A
+triggerInputPort.triggerInput().send();
 //}}}USR
 }
 
-void InputLoop_Actor::enterStateV( void )
+void Discipline_Actor::enterStateV( void )
 {
     switch( getCurrentState() )
     {
     case 3:
-        enter3_Take_Input(  );
+        enter3_Initiate_Discipline(  );
         break;
     default:
         RTActor::enterStateV(  );
@@ -50,7 +41,7 @@ void InputLoop_Actor::enterStateV( void )
     }
 }
 
-INLINE_CHAINS void InputLoop_Actor::chain1_Initial( void )
+INLINE_CHAINS void Discipline_Actor::chain1_Initial( void )
 {
     rtgChainBegin( 1, "Initial" );
     rtgTransitionBegin(  );
@@ -58,25 +49,25 @@ INLINE_CHAINS void InputLoop_Actor::chain1_Initial( void )
     enterState( 2 );
 }
 
-INLINE_CHAINS void InputLoop_Actor::chain2_hatch( void )
+INLINE_CHAINS void Discipline_Actor::chain2_discipline_activated( void )
 {
-    rtgChainBegin( 2, "hatch" );
+    rtgChainBegin( 2, "discipline activated" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 3 );
 }
 
-INLINE_CHAINS void InputLoop_Actor::chain3_input_requested( void )
+INLINE_CHAINS void Discipline_Actor::chain3_exit( void )
 {
-    rtgChainBegin( 3, "input requested" );
+    rtgChainBegin( 3, "exit" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
-    enterState( 3 );
+    enterState( 2 );
 }
 
-void InputLoop_Actor::rtsBehavior( int signalIndex, int portIndex )
+void Discipline_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
         {
@@ -112,11 +103,11 @@ void InputLoop_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 1 /*statusPort*/:
+                case 3 /*disciplinePort*/:
                     switch( signalIndex )
                     {
-                    case StatusProt::Conjugate::rti_hatch:
-                        chain2_hatch(  );
+                    case DisciplineProt::Conjugate::rti_initDiscipline:
+                        chain2_discipline_activated(  );
                         return ;
                     default:
                         break;
@@ -126,7 +117,7 @@ void InputLoop_Actor::rtsBehavior( int signalIndex, int portIndex )
                     break;
                 }
                 break;
-            case 3 /* Take Input (State Machine::Take Input) */:
+            case 3 /* Initiate Discipline (State Machine::Initiate Discipline) */:
                 switch( portIndex )
                 {
                 case 0 /*RTControlPort*/:
@@ -138,11 +129,11 @@ void InputLoop_Actor::rtsBehavior( int signalIndex, int portIndex )
                         break;
                     }
                     break;
-                case 3 /*triggerInputPort*/:
+                case 3 /*disciplinePort*/:
                     switch( signalIndex )
                     {
-                    case InputProt::Conjugate::rti_triggerInput:
-                        chain3_input_requested(  );
+                    case DisciplineProt::Conjugate::rti_exit:
+                        chain3_exit(  );
                         return ;
                     default:
                         break;
@@ -159,74 +150,74 @@ void InputLoop_Actor::rtsBehavior( int signalIndex, int portIndex )
         }
 }
 
-const RTStateId InputLoop_Actor::rtg_parent_state[] =
+const RTStateId Discipline_Actor::rtg_parent_state[] =
 {
     0
     , 1
     , 1
 };
 
-const RTActor_class * InputLoop_Actor::getActorData( void ) const
+const RTActor_class * Discipline_Actor::getActorData( void ) const
 {
-    return &InputLoop_Actor::rtg_class;
+    return &Discipline_Actor::rtg_class;
 }
 
-const RTActor_class InputLoop_Actor::rtg_class =
+const RTActor_class Discipline_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
     , 3
-    , InputLoop_Actor::rtg_parent_state
-    , &InputLoop
+    , Discipline_Actor::rtg_parent_state
+    , &Discipline
     , 0
     , nullptr
     , 3
-    , InputLoop_Actor::rtg_ports
+    , Discipline_Actor::rtg_ports
     , 0
     , nullptr
     , 0
     , nullptr
 };
 
-const RTPortDescriptor InputLoop_Actor::rtg_ports[] =
+const RTPortDescriptor Discipline_Actor::rtg_ports[] =
 {
     {
-        "statusPort"
+        "triggerInputPort"
         , nullptr
-        , &StatusProt::Conjugate::rt_class
-        , RTOffsetOf( InputLoop_Actor, statusPort )
+        , &InputProt::Base::rt_class
+        , RTOffsetOf( Discipline_Actor, triggerInputPort )
         , 1
         , 1
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
     , {
-        "inputPort"
+        "updateValPort"
         , nullptr
-        , &InputProt::Base::rt_class
-        , RTOffsetOf( InputLoop_Actor, inputPort )
+        , &UpdateValProt::Base::rt_class
+        , RTOffsetOf( Discipline_Actor, updateValPort )
         , 1
         , 2
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
     , {
-        "triggerInputPort"
+        "disciplinePort"
         , nullptr
-        , &InputProt::Conjugate::rt_class
-        , RTOffsetOf( InputLoop_Actor, triggerInputPort )
-        , 4
+        , &DisciplineProt::Conjugate::rt_class
+        , RTOffsetOf( Discipline_Actor, disciplinePort )
+        , 1
         , 3
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
 };
 
-int InputLoop_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
+int Discipline_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg_repIndex )
 {
     switch( rtg_portId )
     {
     case 0:
         if( rtg_repIndex < 1 )
         {
-            rtg_end.port = &statusPort;
+            rtg_end.port = &triggerInputPort;
             rtg_end.index = rtg_repIndex;
             return 1;
         }
@@ -234,15 +225,15 @@ int InputLoop_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg
     case 1:
         if( rtg_repIndex < 1 )
         {
-            rtg_end.port = &inputPort;
+            rtg_end.port = &updateValPort;
             rtg_end.index = rtg_repIndex;
             return 1;
         }
         break;
     case 2:
-        if( rtg_repIndex < 4 )
+        if( rtg_repIndex < 1 )
         {
-            rtg_end.port = &triggerInputPort;
+            rtg_end.port = &disciplinePort;
             rtg_end.index = rtg_repIndex;
             return 1;
         }
@@ -257,34 +248,34 @@ int InputLoop_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, int rtg
 static const RTRelayDescriptor rtg_relays[] =
 {
     {
-        "statusPort"
-        , &StatusProt::Conjugate::rt_class
-        , 1
-    }
-    , {
-        "inputPort"
+        "triggerInputPort"
         , &InputProt::Base::rt_class
         , 1
     }
     , {
-        "triggerInputPort"
-        , &InputProt::Conjugate::rt_class
-        , 4
+        "updateValPort"
+        , &UpdateValProt::Base::rt_class
+        , 1
+    }
+    , {
+        "disciplinePort"
+        , &DisciplineProt::Conjugate::rt_class
+        , 1
     }
 };
 
-static RTActor * new_InputLoop_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
+static RTActor * new_Discipline_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
 {
-    return new InputLoop_Actor( rtg_rts, rtg_ref );
+    return new Discipline_Actor( rtg_rts, rtg_ref );
 }
 
-const RTActorClass InputLoop =
+const RTActorClass Discipline =
 {
     nullptr
-    , "InputLoop"
+    , "Discipline"
     , 0 /*RTVersionId*/
     , 3
     , rtg_relays
-    , new_InputLoop_Actor
+    , new_Discipline_Actor
 };
 

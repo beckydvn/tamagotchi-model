@@ -1971,7 +1971,7 @@ showStatus();</body>
       <ownedBehavior xmi:type="uml:OpaqueBehavior" xmi:id="_-IkOQDRsEfGs993j7RVgLQ" name="showStatus" specification="_mW9aQDRsEfGs993j7RVgLQ">
         <language>C++</language>
         <body>std::cout&lt;&lt; &quot;\n-----------------------------------------------------------------------&quot; &lt;&lt;std::endl;&#xD;
-std::cout&lt;&lt; tama_name &lt;&lt; &quot; STATUS:\n&quot; &lt;&lt; &quot;\nHUNGER: &quot; &lt;&lt; hunger &lt;&lt; &quot;\nHAPPINESS: &quot; &lt;&lt; happiness &lt;&lt; &quot;\nDISCIPLINE: &quot; &lt;&lt; discipline &lt;&lt; &quot;\nHEALTH: &quot; &lt;&lt; health &lt;&lt; &quot;\n&quot; &lt;&lt; tama &lt;&lt;std::endl;&#xD;
+std::cout&lt;&lt; tama_name &lt;&lt; &quot; STATUS:\n&quot; &lt;&lt; &quot;\nHUNGER: &quot; &lt;&lt; hunger &lt;&lt; &quot;\nHAPPINESS: &quot; &lt;&lt; happiness &lt;&lt; &quot;\nDISCIPLINE: &quot; &lt;&lt; disc &lt;&lt; &quot;\nHEALTH: &quot; &lt;&lt; health &lt;&lt; &quot;\n&quot; &lt;&lt; tama &lt;&lt;std::endl;&#xD;
 std::cout&lt;&lt; &quot;-----------------------------------------------------------------------&quot; &lt;&lt;std::endl;&#xD;
 std::cout &lt;&lt; &quot;\nWHAT WILL &quot; &lt;&lt; owner_name &lt;&lt; &quot; DO?&quot; &lt;&lt; options &lt;&lt; std::endl;&#xD;
 triggerInputPort.triggerInput().send();</body>
@@ -2645,9 +2645,9 @@ std::cout&lt;&lt; &quot;\nATE THE MEAL...&quot; &lt;&lt;std::endl;&#xD;
           <details xmi:id="_odGCgjbsEfGJaL0kWrhu3A" key="cpp/initializerKind/org.eclipse.uml2.uml.Enumeration" value="brace"/>
         </eAnnotations>
         <type xmi:type="uml:PrimitiveType" href="platform:/plugin/com.ibm.xtools.umldt.rt.cpp.core/libraries/CppPrimitiveDatatypes.emx#_f0875xKyEdyaM9S2zG4bgA?CppPrimitiveDatatypes/char?"/>
-        <defaultValue xmi:type="uml:OpaqueExpression" xmi:id="_uNTGkDbsEfGJaL0kWrhu3A" name="">
+        <defaultValue xmi:type="uml:OpaqueExpression" xmi:id="_79CNADbsEfGJaL0kWrhu3A" name="">
           <language>C++</language>
-          <body>&quot;\TRAIN OPTIONS: (EXIT)&quot;</body>
+          <body>&quot;\nTRAIN OPTIONS: (EXIT)&quot;</body>
         </defaultValue>
       </ownedAttribute>
       <ownedBehavior xmi:type="uml:StateMachine" xmi:id="_1d5i4DXaEfGJaL0kWrhu3A" name="State Machine">
@@ -2743,7 +2743,7 @@ std::cout&lt;&lt; &quot;\nATE THE MEAL...&quot; &lt;&lt;std::endl;&#xD;
 	}&#xD;
 	else if(input == &quot;TRAIN&quot;){&#xD;
 		updateOptionsPort.updateOptions(trainOptions).send();&#xD;
-		disciplinePort.initPlay().send();&#xD;
+		disciplinePort.initDiscipline().send();&#xD;
 		mode = &quot;TRAIN&quot;;&#xD;
 	}&#xD;
 }&#xD;
