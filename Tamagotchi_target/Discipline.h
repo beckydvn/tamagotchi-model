@@ -32,6 +32,7 @@ protected:
     INLINE_METHODS void enter4_Sit( void );
     INLINE_METHODS void enter5_Untrained( void );
     INLINE_METHODS void enter6_Doesn_t_Sit( void );
+    INLINE_METHODS int guard4_sit( const void * rtdata, DisciplineProt::Conjugate * rtport );
     INLINE_METHODS int guard5_sitCount_4( const void * rtdata, DisciplineProt::Conjugate * rtport );
     INLINE_METHODS void transition7_reinforce( const void * rtdata, DisciplineProt::Conjugate * rtport );
     INLINE_METHODS int guard8_yes( const void * rtdata, DisciplineProt::Conjugate * rtport );

@@ -81,6 +81,13 @@ std::cout<< "\nDOESN'T SIT..." <<std::endl;
 //}}}USR
 }
 
+INLINE_METHODS int Discipline_Actor::guard4_sit( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_iZaQQDeFEfGJaL0kWrhu3A
+rng = (rand() % 2);
+//}}}USR
+}
+
 INLINE_METHODS int Discipline_Actor::guard5_sitCount_4( const void * rtdata, DisciplineProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_B5_rUDdIEfGJaL0kWrhu3A
@@ -398,8 +405,12 @@ void Discipline_Actor::rtsBehavior( int signalIndex, int portIndex )
                         chain3_exit(  );
                         return ;
                     case DisciplineProt::Conjugate::rti_sit:
-                        chain4_sit(  );
-                        return ;
+                        if( guard4_sit( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) ) )
+                        {
+                            chain4_sit(  );
+                            return ;
+                        }
+                        break;
                     default:
                         break;
                     }

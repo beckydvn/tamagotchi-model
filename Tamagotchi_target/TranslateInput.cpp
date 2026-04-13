@@ -60,7 +60,7 @@ INLINE_METHODS void TranslateInput_Actor::enter3_Send_Signals( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_doD84DXfEfGJaL0kWrhu3A
 if(mode == "IDLE"){
-	 if(input == "FEED"){
+	if(input == "FEED"){
 		 std::cout << "\nYOU ARE HERE" << std::endl;
 		 feedPort.initFeed().send();
 		 updateOptionsPort.updateOptions(feedOptions).send();
@@ -84,18 +84,17 @@ if(mode == "IDLE"){
 else if(mode == "FEED"){
 	if(input == "SNACK"){
 		feedPort.feedSnack().send();
-//		updateOptionsPort.updateOptions(feedOptions).send();
 		updateTamaPort.updateTama(tama_snack).send();
 	}
 	else if(input == "MEAL"){
 		feedPort.feedMeal().send();
-//		updateOptionsPort.updateOptions(feedOptions).send();
 		updateTamaPort.updateTama(tama_meal).send();
 	}
 	else if(input == "EXIT"){
 		feedPort.exit().send();
-		updateOptionsPort.updateOptions(idleOptions).send();
 		updateTamaPort.updateTama(tama_happy).send();
+		updateOptionsPort.updateOptions(idleOptions).send();
+
 		mode = "IDLE";
 	}
 	else{
@@ -127,8 +126,8 @@ else if(mode == "TRAIN"){
 	}
 	else if(input == "EXIT"){
 		disciplinePort.exit().send();
-		updateOptionsPort.updateOptions(idleOptions).send();
 		updateTamaPort.updateTama(tama_happy).send();
+		updateOptionsPort.updateOptions(idleOptions).send();
 		mode = "IDLE";
 	}
 	else{

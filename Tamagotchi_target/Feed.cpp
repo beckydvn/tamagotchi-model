@@ -86,6 +86,7 @@ INLINE_METHODS void Feed_Actor::transition6_getMeal( const void * rtdata, FeedPr
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_wAme0DX9EfGJaL0kWrhu3A
 updateValPort.updateHunger(3).send();
+updateValPort.updateHealth(1).send();
 std::cout<< "\nATE THE MEAL..." <<std::endl;
 
 //}}}USR
