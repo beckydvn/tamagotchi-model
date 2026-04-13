@@ -20,6 +20,9 @@ struct DisciplineProt
     public:
         inline RTOutSignal initDiscipline( void );
         inline RTOutSignal exit( void );
+        inline RTOutSignal sit( void );
+        inline RTOutSignal reinforce( void );
+        inline RTOutSignal reinforce( const RTTypedValue & data );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -33,15 +36,19 @@ struct DisciplineProt
         {
             rti_initDiscipline = rtiLast_RTRootProtocol + 1
             , rti_exit
+            , rti_sit
+            , rti_reinforce
         };
     protected:
         enum
         {
-            rtiLast_DisciplineProt = rti_exit
+            rtiLast_DisciplineProt = rti_reinforce
         };
     public:
         inline RTInSignal initDiscipline( void );
         inline RTInSignal exit( void );
+        inline RTInSignal sit( void );
+        inline RTInSignal reinforce( void );
         static const RTProtocolDescriptor rt_class;
     private:
         static const RTSignalDescriptor rt_signals[];
@@ -66,6 +73,21 @@ inline RTOutSignal DisciplineProt::Base::exit( void )
     return RTOutSignal( this, Conjugate::rti_exit, nullptr, &RTType_void );
 }
 
+inline RTOutSignal DisciplineProt::Base::sit( void )
+{
+    return RTOutSignal( this, Conjugate::rti_sit, nullptr, &RTType_void );
+}
+
+inline RTOutSignal DisciplineProt::Base::reinforce( void )
+{
+    return RTOutSignal( this, Conjugate::rti_reinforce, nullptr, &RTType_void );
+}
+
+inline RTOutSignal DisciplineProt::Base::reinforce( const RTTypedValue & data )
+{
+    return RTOutSignal( this, Conjugate::rti_reinforce, data.data, data.type );
+}
+
 inline DisciplineProt::Conjugate::Conjugate( void )
     : RTRootProtocol(  )
 {
@@ -83,6 +105,16 @@ inline RTInSignal DisciplineProt::Conjugate::initDiscipline( void )
 inline RTInSignal DisciplineProt::Conjugate::exit( void )
 {
     return RTInSignal( this, rti_exit );
+}
+
+inline RTInSignal DisciplineProt::Conjugate::sit( void )
+{
+    return RTInSignal( this, rti_sit );
+}
+
+inline RTInSignal DisciplineProt::Conjugate::reinforce( void )
+{
+    return RTInSignal( this, rti_reinforce );
 }
 
 #endif /* DisciplineProt_h */

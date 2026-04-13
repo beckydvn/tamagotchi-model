@@ -72,13 +72,6 @@ std::cout << "PET IS TIRED..." << std::endl;
 //}}}USR
 }
 
-INLINE_METHODS void Play_Actor::transition6_exit( const void * rtdata, PlayProt::Conjugate * rtport )
-{
-//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_zTYcMDYTEfGJaL0kWrhu3A
-throwCount = 0;
-//}}}USR
-}
-
 INLINE_METHODS void Play_Actor::transition7_sleep( const void * rtdata, ResetPlayProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_fNh5EDaTEfGJaL0kWrhu3A
@@ -148,7 +141,6 @@ INLINE_CHAINS void Play_Actor::chain6_exit( void )
     rtgChainBegin( 3, "exit" );
     exitState( rtg_parent_state );
     rtgTransitionBegin(  );
-    transition6_exit( msg->data, static_cast< PlayProt::Conjugate * > ( msg->sap() ) );
     rtgTransitionEnd(  );
     enterState( 2 );
 }

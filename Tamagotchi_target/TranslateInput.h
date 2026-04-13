@@ -26,6 +26,7 @@ protected:
     PlayProt::Base playPort;
     UpdateTamaProt::Base updateTamaPort;
     DisciplineProt::Base disciplinePort;
+    InputProt::Base triggerInputPort;
 private:
     const char* tama_happy { "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣴⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣶⣤⣄⣀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣾⡿⠿⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠛⠻⠿⣿⣷⣦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
@@ -168,7 +169,9 @@ private:
     const char* feedOptions { "\nFEED OPTIONS: (SNACK, MEAL, EXIT)" } ;
     const char* idleOptions { "\nACTIVITY OPTIONS: (FEED, PLAY, TRAIN)" } ;
     const char* playOptions { "\nPLAY OPTIONS: (FETCH, EXIT)" } ;
-    const char* trainOptions { "\nTRAIN OPTIONS: (EXIT)" } ;
+    const char* trainOptions { "\nTRAIN OPTIONS: (SIT, EXIT)" } ;
+    const char* sitOptions { "\nREINFORCE WITH TREAT? OPTIONS: (YES, NO)" } ;
+    const char* errorMsg { "\nNOT VALID INPUT." } ;
 protected:
     INLINE_METHODS void enter3_Send_Signals( void );
     virtual void enterStateV( void ) override;

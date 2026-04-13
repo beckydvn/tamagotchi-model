@@ -42,7 +42,7 @@ static const RTInterfaceDescriptor rtg_interfaces_input[] =
     }
     , {
         "triggerInputPort"
-        , 4
+        , 5
     }
 };
 
@@ -120,6 +120,10 @@ static const RTInterfaceDescriptor rtg_interfaces_translateInput[] =
         "disciplinePort"
         , 1
     }
+    , {
+        "triggerInputPort"
+        , 1
+    }
 };
 
 static const RTBindingDescriptor rtg_bindings_translateInput[] =
@@ -147,6 +151,10 @@ static const RTBindingDescriptor rtg_bindings_translateInput[] =
     , {
         5
         , &DisciplineProt::Conjugate::rt_class
+    }
+    , {
+        6
+        , &InputProt::Conjugate::rt_class
     }
 };
 
@@ -347,6 +355,7 @@ tama = tama_happy;
 INLINE_METHODS void Update_Actor::transition2_timeout_update_vals( const void * rtdata, Timing::Base * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_JVtHADbcEfGJaL0kWrhu3A
+std::cout << "\nGENERATING RANDOM VALUE" << std::endl;
 rng = (rand() % 100);
 //}}}USR
 }
@@ -405,8 +414,8 @@ std::cout << "\n" << tama << std::endl;
 INLINE_METHODS void Update_Actor::transition6_hatch( const void * rtdata, StatusProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_710E8DaPEfGJaL0kWrhu3A
-sleepTimer = timingUpdateValsPort.informEvery(RTTimespec(updateValTime,0));
-updateValTimer = timingSleepPort.informEvery(RTTimespec(sleepTime,0));
+//updateValTimer = timingUpdateValsPort.informEvery(RTTimespec(updateValTime,0));
+//sleepTimer = timingSleepPort.informEvery(RTTimespec(sleepTime,0));
 
 //}}}USR
 }
@@ -466,6 +475,7 @@ INLINE_METHODS void Update_Actor::transition13_updateOptions( const void * rtdat
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_4APKsDYEEfGJaL0kWrhu3A
 options = (const char *)rtdata;
+showStatus();
 //}}}USR
 }
 
@@ -513,6 +523,14 @@ INLINE_METHODS void Update_Actor::transition19_timeout( const void * rtdata, Tim
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_4kVh8DbjEfGJaL0kWrhu3A
 showStatus();
+//}}}USR
+}
+
+INLINE_METHODS void Update_Actor::transition20_updateDiscipline( const int * rtdata, UpdateValProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_bN6SsDdgEfGJaL0kWrhu3A
+disc += *rtdata;
+//showStatus();
 //}}}USR
 }
 
@@ -719,6 +737,16 @@ INLINE_CHAINS void Update_Actor::chain19_timeout( void )
     enterState( 3 );
 }
 
+INLINE_CHAINS void Update_Actor::chain20_updateDiscipline( void )
+{
+    rtgChainBegin( 3, "updateDiscipline" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition20_updateDiscipline( static_cast< const int * > ( msg->data ), static_cast< UpdateValProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
 void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
 {
     for (int stateIndex = getCurrentState() ; ;stateIndex = rtg_parent_state[ stateIndex - 1 ] )
@@ -794,6 +822,9 @@ void Update_Actor::rtsBehavior( int signalIndex, int portIndex )
                 case 4 /*updateValPort*/:
                     switch( signalIndex )
                     {
+                    case UpdateValProt::Conjugate::rti_updateDiscipline:
+                        chain20_updateDiscipline(  );
+                        return ;
                     case UpdateValProt::Conjugate::rti_updateHappiness:
                         chain14_updateHappiness(  );
                         return ;
@@ -977,9 +1008,9 @@ const RTComponentDescriptor Update_Actor::rtg_capsule_roles[] =
         , RTComponentDescriptor::Fixed
         , 1
         , 1
-        , 6
+        , 7
         , rtg_interfaces_translateInput
-        , 6
+        , 7
         , rtg_bindings_translateInput
     }
     , {
@@ -1215,6 +1246,8 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
                 return play._followIn( rtg_end, 2, rtg_repIndex - 2 );
             if( rtg_repIndex < 4 )
                 return discipline._followIn( rtg_end, 0, rtg_repIndex - 3 );
+            if( rtg_repIndex < 5 )
+                return translateInput._followIn( rtg_end, 6, rtg_repIndex - 4 );
             break;
         default:
             break;
@@ -1277,6 +1310,10 @@ int Update_Actor::_followOutV( RTBindingEnd & rtg_end, int rtg_compId, int rtg_p
         case 5:
             if( rtg_repIndex < 1 )
                 return discipline._followIn( rtg_end, 2, rtg_repIndex );
+            break;
+        case 6:
+            if( rtg_repIndex < 1 )
+                return input._followIn( rtg_end, 2, rtg_repIndex + 4 );
             break;
         default:
             break;

@@ -34,7 +34,7 @@ const RTProtocolDescriptor DisciplineProt::Conjugate::rt_class =
     , &DisciplineProt::Base::rt_class
     , "DisciplineProt"
     , 0
-    , 4
+    , 6
     , DisciplineProt::Conjugate::rt_signals
 };
 
@@ -51,6 +51,11 @@ const RTSignalDescriptor DisciplineProt::Conjugate::rt_signals[] =
         , DisciplineProt::Conjugate::rti_initDiscipline
     }
     , {
+        "reinforce"
+        , nullptr
+        , DisciplineProt::Conjugate::rti_reinforce
+    }
+    , {
         "rtBound"
         , nullptr
         , DisciplineProt::Conjugate::rti_rtBound
@@ -59,6 +64,11 @@ const RTSignalDescriptor DisciplineProt::Conjugate::rt_signals[] =
         "rtUnbound"
         , nullptr
         , DisciplineProt::Conjugate::rti_rtUnbound
+    }
+    , {
+        "sit"
+        , &RTType_void
+        , DisciplineProt::Conjugate::rti_sit
     }
 };
 

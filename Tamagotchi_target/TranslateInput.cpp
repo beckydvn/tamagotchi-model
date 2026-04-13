@@ -39,6 +39,13 @@ static const RTTypeModifier rtg_tm_TranslateInput_Actor_trainOptions =
     , 1
 };
 
+static const RTTypeModifier rtg_tm_TranslateInput_Actor_errorMsg =
+{
+    RTNumberConstant
+    , 1
+    , 1
+};
+
 #define SUPER RTActor
 TranslateInput_Actor::TranslateInput_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
     : RTActor( rtg_rts ,rtg_ref )
@@ -54,6 +61,7 @@ INLINE_METHODS void TranslateInput_Actor::enter3_Send_Signals( void )
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_doD84DXfEfGJaL0kWrhu3A
 if(mode == "IDLE"){
 	 if(input == "FEED"){
+		 std::cout << "\nYOU ARE HERE" << std::endl;
 		 feedPort.initFeed().send();
 		 updateOptionsPort.updateOptions(feedOptions).send();
 		 mode = "FEED";
@@ -68,14 +76,20 @@ if(mode == "IDLE"){
 		disciplinePort.initDiscipline().send();
 		mode = "TRAIN";
 	}
+	else{
+		std::cout << errorMsg << std::endl;
+		triggerInputPort.triggerInput().send();
+	}
 }
 else if(mode == "FEED"){
 	if(input == "SNACK"){
 		feedPort.feedSnack().send();
+//		updateOptionsPort.updateOptions(feedOptions).send();
 		updateTamaPort.updateTama(tama_snack).send();
 	}
 	else if(input == "MEAL"){
 		feedPort.feedMeal().send();
+//		updateOptionsPort.updateOptions(feedOptions).send();
 		updateTamaPort.updateTama(tama_meal).send();
 	}
 	else if(input == "EXIT"){
@@ -83,6 +97,10 @@ else if(mode == "FEED"){
 		updateOptionsPort.updateOptions(idleOptions).send();
 		updateTamaPort.updateTama(tama_happy).send();
 		mode = "IDLE";
+	}
+	else{
+		std::cout << errorMsg << std::endl;
+		triggerInputPort.triggerInput().send();
 	}
 }
 else if(mode == "PLAY"){
@@ -96,14 +114,47 @@ else if(mode == "PLAY"){
 		updateTamaPort.updateTama(tama_happy).send();
 		mode = "IDLE";
 	}
+	else{
+		std::cout << errorMsg << std::endl;
+		triggerInputPort.triggerInput().send();
+	}
 }
 else if(mode == "TRAIN"){
-	if(input == "EXIT"){
+	if(input == "SIT"){
+		disciplinePort.sit().send();
+		updateOptionsPort.updateOptions(sitOptions).send();
+		mode = "SIT";
+	}
+	else if(input == "EXIT"){
 		disciplinePort.exit().send();
 		updateOptionsPort.updateOptions(idleOptions).send();
 		updateTamaPort.updateTama(tama_happy).send();
 		mode = "IDLE";
 	}
+	else{
+		std::cout << errorMsg << std::endl;
+		triggerInputPort.triggerInput().send();
+	}
+}
+else if(mode == "SIT"){
+	if(input == "YES"){
+		disciplinePort.reinforce("YES").send();
+		updateOptionsPort.updateOptions(trainOptions).send();
+		mode = "TRAIN";
+	}
+	else if(input == "NO"){
+		disciplinePort.reinforce("NO").send();
+		updateOptionsPort.updateOptions(trainOptions).send();
+		mode = "TRAIN";
+	}
+	else{
+		std::cout << errorMsg << std::endl;
+		triggerInputPort.triggerInput().send();
+	}
+}
+else{
+	std::cout << errorMsg << std::endl;
+	triggerInputPort.triggerInput().send();
 }
 //}}}USR
 }
@@ -133,6 +184,7 @@ INLINE_METHODS void TranslateInput_Actor::transition3_gotInput( const void * rtd
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Nd20kDXeEfGJaL0kWrhu3A
 input = (const char *)rtdata;
+std::cout << "\nGOT INPUT: " << input << " MODE: " << mode << std::endl;
 
 //}}}USR
 }
@@ -269,11 +321,11 @@ const RTActor_class TranslateInput_Actor::rtg_class =
     , &TranslateInput
     , 0
     , nullptr
-    , 6
+    , 7
     , TranslateInput_Actor::rtg_ports
     , 0
     , nullptr
-    , 4
+    , 5
     , TranslateInput_Actor::rtg_TranslateInput_Actor_fields
 };
 
@@ -333,6 +385,15 @@ const RTPortDescriptor TranslateInput_Actor::rtg_ports[] =
         , 6
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
     }
+    , {
+        "triggerInputPort"
+        , nullptr
+        , &InputProt::Base::rt_class
+        , RTOffsetOf( TranslateInput_Actor, triggerInputPort )
+        , 1
+        , 7
+        , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
 };
 
 const RTFieldDescriptor TranslateInput_Actor::rtg_TranslateInput_Actor_fields[] =
@@ -360,6 +421,12 @@ const RTFieldDescriptor TranslateInput_Actor::rtg_TranslateInput_Actor_fields[] 
         , RTOffsetOf( TranslateInput_Actor, trainOptions )
         , &RTType_char
         , &rtg_tm_TranslateInput_Actor_trainOptions
+    }
+    , {
+        "errorMsg"
+        , RTOffsetOf( TranslateInput_Actor, errorMsg )
+        , &RTType_char
+        , &rtg_tm_TranslateInput_Actor_errorMsg
     }
 };
 
@@ -415,6 +482,14 @@ int TranslateInput_Actor::_followInV( RTBindingEnd & rtg_end, int rtg_portId, in
             return 1;
         }
         break;
+    case 6:
+        if( rtg_repIndex < 1 )
+        {
+            rtg_end.port = &triggerInputPort;
+            rtg_end.index = rtg_repIndex;
+            return 1;
+        }
+        break;
     default:
         break;
     }
@@ -454,6 +529,11 @@ static const RTRelayDescriptor rtg_relays[] =
         , &DisciplineProt::Base::rt_class
         , 1
     }
+    , {
+        "triggerInputPort"
+        , &InputProt::Base::rt_class
+        , 1
+    }
 };
 
 static RTActor * new_TranslateInput_Actor( RTController * rtg_rts, RTActorRef * rtg_ref )
@@ -466,7 +546,7 @@ const RTActorClass TranslateInput =
     nullptr
     , "TranslateInput"
     , 0 /*RTVersionId*/
-    , 6
+    , 7
     , rtg_relays
     , new_TranslateInput_Actor
 };

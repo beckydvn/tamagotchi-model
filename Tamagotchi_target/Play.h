@@ -31,7 +31,6 @@ protected:
     INLINE_METHODS int guard4_throws_5( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition4_throws_5( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition5_caught_last( const void * rtdata, PlayProt::Conjugate * rtport );
-    INLINE_METHODS void transition6_exit( const void * rtdata, PlayProt::Conjugate * rtport );
     INLINE_METHODS void transition7_sleep( const void * rtdata, ResetPlayProt::Conjugate * rtport );
     INLINE_METHODS void transition8_sleep( const void * rtdata, ResetPlayProt::Conjugate * rtport );
 private:

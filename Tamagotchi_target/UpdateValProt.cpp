@@ -34,7 +34,7 @@ const RTProtocolDescriptor UpdateValProt::Conjugate::rt_class =
     , &UpdateValProt::Base::rt_class
     , "UpdateValProt"
     , 0
-    , 5
+    , 6
     , UpdateValProt::Conjugate::rt_signals
 };
 
@@ -49,6 +49,11 @@ const RTSignalDescriptor UpdateValProt::Conjugate::rt_signals[] =
         "rtUnbound"
         , nullptr
         , UpdateValProt::Conjugate::rti_rtUnbound
+    }
+    , {
+        "updateDiscipline"
+        , &RTType_int
+        , UpdateValProt::Conjugate::rti_updateDiscipline
     }
     , {
         "updateHappiness"

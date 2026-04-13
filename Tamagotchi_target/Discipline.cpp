@@ -9,6 +9,13 @@ static const char * const rtg_state_names[] =
     "<machine>"
     , "Start"
     , "Initiate Discipline"
+    , "Sit"
+    , "Untrained"
+    , "Doesn't Sit"
+    , ""
+    , ""
+    , ""
+    , ""
 };
 
 #define SUPER RTActor
@@ -35,10 +42,131 @@ void Discipline_Actor::enterStateV( void )
     case 3:
         enter3_Initiate_Discipline(  );
         break;
+    case 4:
+        enter4_Sit(  );
+        break;
+    case 5:
+        enter5_Untrained(  );
+        break;
+    case 6:
+        enter6_Doesn_t_Sit(  );
+        break;
     default:
         RTActor::enterStateV(  );
         break;
     }
+}
+
+INLINE_METHODS void Discipline_Actor::enter4_Sit( void )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_DadGkDdKEfGJaL0kWrhu3A
+std::cout<< "\nSITS!" <<std::endl;
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::enter5_Untrained( void )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_bHVyoDdKEfGJaL0kWrhu3A
+std::cout<< "\nPET IS THINKING..." <<std::endl;
+rng = (rand() % 2);
+generalTimer = timing.informIn(RTTimespec(3,0));
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::enter6_Doesn_t_Sit( void )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_lgzUQDdfEfGJaL0kWrhu3A
+std::cout<< "\nDOESN'T SIT..." <<std::endl;
+
+//}}}USR
+}
+
+INLINE_METHODS int Discipline_Actor::guard5_sitCount_4( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_B5_rUDdIEfGJaL0kWrhu3A
+return (sitCount <= 4);
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::transition7_reinforce( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_0LGVkDdLEfGJaL0kWrhu3A
+input = (const char *)rtdata;
+//}}}USR
+}
+
+INLINE_METHODS int Discipline_Actor::guard8_yes( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_HVwzoDdMEfGJaL0kWrhu3A
+return (input == "YES");
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::transition8_yes( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_AxsIADdfEfGJaL0kWrhu3A
+std::cout<< "\nGAVE A TREAT!" <<std::endl;
+updateValPort.updateDiscipline(2).send();
+//}}}USR
+}
+
+INLINE_METHODS int Discipline_Actor::guard10_50_chance( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_qOxvADdOEfGJaL0kWrhu3A
+return (rng == 0);
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::transition12_reinforce( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_SsYocDdeEfGJaL0kWrhu3A
+input = (const char *)rtdata;
+//}}}USR
+}
+
+INLINE_METHODS int Discipline_Actor::guard13_yes( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_jNRA0DdeEfGJaL0kWrhu3A
+return (input == "YES");
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::transition13_yes( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_MJftwDdfEfGJaL0kWrhu3A
+std::cout<< "\nGAVE A TREAT!" <<std::endl;
+updateValPort.updateDiscipline(-2).send();
+//}}}USR
+}
+
+INLINE_METHODS int Discipline_Actor::guard14_no( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_lsSA8DdeEfGJaL0kWrhu3A
+return (input == "NO");
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::transition14_no( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_BM0k0DdfEfGJaL0kWrhu3A
+std::cout<< "\nYOU DIDN'T GIVE A TREAT." <<std::endl;
+updateValPort.updateDiscipline(-1).send();
+//}}}USR
+}
+
+INLINE_METHODS int Discipline_Actor::guard15_no( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_oeXuEDdeEfGJaL0kWrhu3A
+return (input == "NO");
+//}}}USR
+}
+
+INLINE_METHODS void Discipline_Actor::transition15_no( const void * rtdata, DisciplineProt::Conjugate * rtport )
+{
+//{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_OLyVoDdfEfGJaL0kWrhu3A
+std::cout<< "\nYOU DIDN'T GIVE A TREAT." <<std::endl;
+updateValPort.updateDiscipline(1).send();
+//}}}USR
 }
 
 INLINE_CHAINS void Discipline_Actor::chain1_Initial( void )
@@ -65,6 +193,140 @@ INLINE_CHAINS void Discipline_Actor::chain3_exit( void )
     rtgTransitionBegin(  );
     rtgTransitionEnd(  );
     enterState( 2 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain4_sit( void )
+{
+    rtgChainBegin( 3, "sit" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    if( guard5_sitCount_4( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain5_sitCount_4(  );
+        return ;
+    }
+    chain6_else(  );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain5_sitCount_4( void )
+{
+    rtgChainBegin( 7, "sitCount <= 4" );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    if( guard10_50_chance( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain10_50_chance(  );
+        return ;
+    }
+    chain11_else(  );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain6_else( void )
+{
+    rtgChainBegin( 7, "else" );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 4 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain7_reinforce( void )
+{
+    rtgChainBegin( 4, "reinforce" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition7_reinforce( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    if( guard8_yes( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain8_yes(  );
+        return ;
+    }
+    if( guard14_no( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain14_no(  );
+        return ;
+    }
+}
+
+INLINE_CHAINS void Discipline_Actor::chain8_yes( void )
+{
+    rtgChainBegin( 8, "yes" );
+    rtgTransitionBegin(  );
+    transition8_yes( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain9_timeout( void )
+{
+    rtgChainBegin( 5, "timeout" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 5 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain10_50_chance( void )
+{
+    rtgChainBegin( 9, "50% chance" );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 4 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain11_else( void )
+{
+    rtgChainBegin( 9, "else" );
+    rtgTransitionBegin(  );
+    rtgTransitionEnd(  );
+    enterState( 6 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain12_reinforce( void )
+{
+    rtgChainBegin( 6, "reinforce" );
+    exitState( rtg_parent_state );
+    rtgTransitionBegin(  );
+    transition12_reinforce( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    if( guard13_yes( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain13_yes(  );
+        return ;
+    }
+    if( guard15_no( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) ) )
+    {
+        chain15_no(  );
+        return ;
+    }
+}
+
+INLINE_CHAINS void Discipline_Actor::chain13_yes( void )
+{
+    rtgChainBegin( 10, "yes" );
+    rtgTransitionBegin(  );
+    transition13_yes( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain14_no( void )
+{
+    rtgChainBegin( 8, "no" );
+    rtgTransitionBegin(  );
+    transition14_no( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
+}
+
+INLINE_CHAINS void Discipline_Actor::chain15_no( void )
+{
+    rtgChainBegin( 10, "no" );
+    rtgTransitionBegin(  );
+    transition15_no( msg->data, static_cast< DisciplineProt::Conjugate * > ( msg->sap() ) );
+    rtgTransitionEnd(  );
+    enterState( 3 );
 }
 
 void Discipline_Actor::rtsBehavior( int signalIndex, int portIndex )
@@ -135,6 +397,87 @@ void Discipline_Actor::rtsBehavior( int signalIndex, int portIndex )
                     case DisciplineProt::Conjugate::rti_exit:
                         chain3_exit(  );
                         return ;
+                    case DisciplineProt::Conjugate::rti_sit:
+                        chain4_sit(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                break;
+            case 4 /* Sit (State Machine::Sit) */:
+                switch( portIndex )
+                {
+                case 0 /*RTControlPort*/:
+                    switch( signalIndex )
+                    {
+                    case 1 /*RTInitSignal*/:
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 3 /*disciplinePort*/:
+                    switch( signalIndex )
+                    {
+                    case DisciplineProt::Conjugate::rti_reinforce:
+                        chain7_reinforce(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                break;
+            case 5 /* Untrained (State Machine::Untrained) */:
+                switch( portIndex )
+                {
+                case 0 /*RTControlPort*/:
+                    switch( signalIndex )
+                    {
+                    case 1 /*RTInitSignal*/:
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 4 /*timing*/:
+                    switch( signalIndex )
+                    {
+                    case Timing::Base::rti_timeout:
+                        chain9_timeout(  );
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                break;
+            case 6 /* Doesn't Sit (State Machine::Doesn't Sit) */:
+                switch( portIndex )
+                {
+                case 0 /*RTControlPort*/:
+                    switch( signalIndex )
+                    {
+                    case 1 /*RTInitSignal*/:
+                        return ;
+                    default:
+                        break;
+                    }
+                    break;
+                case 3 /*disciplinePort*/:
+                    switch( signalIndex )
+                    {
+                    case DisciplineProt::Conjugate::rti_reinforce:
+                        chain12_reinforce(  );
+                        return ;
                     default:
                         break;
                     }
@@ -155,6 +498,9 @@ const RTStateId Discipline_Actor::rtg_parent_state[] =
     0
     , 1
     , 1
+    , 1
+    , 1
+    , 1
 };
 
 const RTActor_class * Discipline_Actor::getActorData( void ) const
@@ -166,17 +512,17 @@ const RTActor_class Discipline_Actor::rtg_class =
 {
     nullptr
     , rtg_state_names
-    , 3
+    , 6
     , Discipline_Actor::rtg_parent_state
     , &Discipline
     , 0
     , nullptr
-    , 3
+    , 4
     , Discipline_Actor::rtg_ports
     , 0
     , nullptr
-    , 0
-    , nullptr
+    , 3
+    , Discipline_Actor::rtg_Discipline_Actor_fields
 };
 
 const RTPortDescriptor Discipline_Actor::rtg_ports[] =
@@ -207,6 +553,37 @@ const RTPortDescriptor Discipline_Actor::rtg_ports[] =
         , 1
         , 3
         , RTPortDescriptor::KindWired + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+    , {
+        "timing"
+        , nullptr
+        , &Timing::Base::rt_class
+        , RTOffsetOf( Discipline_Actor, timing )
+        , 1
+        , 4
+        , RTPortDescriptor::KindSpecial + RTPortDescriptor::NotificationDisabled + RTPortDescriptor::RegisterNotPermitted + RTPortDescriptor::VisibilityPublic
+    }
+};
+
+const RTFieldDescriptor Discipline_Actor::rtg_Discipline_Actor_fields[] =
+{
+    {
+        "sitCount"
+        , RTOffsetOf( Discipline_Actor, sitCount )
+        , &RTType_int
+        , nullptr
+    }
+    , {
+        "rng"
+        , RTOffsetOf( Discipline_Actor, rng )
+        , &RTType_int
+        , nullptr
+    }
+    , {
+        "generalTimer"
+        , RTOffsetOf( Discipline_Actor, generalTimer )
+        , &RTType_RTTimerId
+        , nullptr
     }
 };
 

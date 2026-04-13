@@ -25,6 +25,7 @@ Feed_Actor::~Feed_Actor( void )
 INLINE_METHODS void Feed_Actor::enter3_Initiate_Feed( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_659mEDaiEfGJaL0kWrhu3A
+std::cout << "\nFEEDING TAMA" << std::endl;
 triggerInputPort.triggerInput().send();
 //}}}USR
 }

@@ -19,8 +19,7 @@ protected:
     StatusProt::Conjugate statusPort;
     InputProt::Base inputPort;
     InputProt::Conjugate triggerInputPort;
-    INLINE_METHODS void enter3_Take_Input( void );
-    virtual void enterStateV( void ) override;
+    INLINE_METHODS void transition3_input_requested( const void * rtdata, InputProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_hatch( void );

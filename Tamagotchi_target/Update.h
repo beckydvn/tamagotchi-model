@@ -46,8 +46,8 @@ private:
     int health { 5 } ;
     int rng { 0 } ;
     std::string options { "\nACTIVITY OPTIONS: (FEED, PLAY, TRAIN)"  } ;
-    int sleepTime { 20 } ;
-    int updateValTime { 10 } ;
+    int sleepTime { 40 } ;
+    int updateValTime { 20 } ;
     RTTimerId sleepTimer;
     RTTimerId updateValTimer;
     const char* tama_angry { "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣴⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣶⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n"
@@ -283,6 +283,7 @@ protected:
     INLINE_METHODS void transition16_updateTama( const void * rtdata, UpdateTamaProt::Conjugate * rtport );
     INLINE_METHODS void transition18_timeout( const void * rtdata, Timing::Base * rtport );
     INLINE_METHODS void transition19_timeout( const void * rtdata, Timing::Base * rtport );
+    INLINE_METHODS void transition20_updateDiscipline( const int * rtdata, UpdateValProt::Conjugate * rtport );
 private:
     INLINE_CHAINS void chain1_Initial( void );
     INLINE_CHAINS void chain2_timeout_update_vals( void );
@@ -303,6 +304,7 @@ private:
     INLINE_CHAINS void chain17_ignore_timeout_update_vals( void );
     INLINE_CHAINS void chain18_timeout( void );
     INLINE_CHAINS void chain19_timeout( void );
+    INLINE_CHAINS void chain20_updateDiscipline( void );
 public:
     virtual void rtsBehavior( int signalIndex, int portIndex ) override;
     static const RTStateId rtg_parent_state[];
