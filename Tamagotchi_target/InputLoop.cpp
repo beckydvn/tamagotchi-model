@@ -24,7 +24,6 @@ InputLoop_Actor::~InputLoop_Actor( void )
 INLINE_METHODS void InputLoop_Actor::transition3_input_requested( const void * rtdata, InputProt::Conjugate * rtport )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_xh8RQDdnEfGJaL0kWrhu3A
-std::cout << "\nGOT REQUEST FOR INPUT" << std::endl;
 char userInput[256];
 fgets(userInput, sizeof(userInput), stdin);
 

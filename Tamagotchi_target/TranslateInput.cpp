@@ -61,7 +61,6 @@ INLINE_METHODS void TranslateInput_Actor::enter3_Send_Signals( void )
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_doD84DXfEfGJaL0kWrhu3A
 if(mode == "IDLE"){
 	if(input == "FEED"){
-		 std::cout << "\nYOU ARE HERE" << std::endl;
 		 feedPort.initFeed().send();
 		 updateOptionsPort.updateOptions(feedOptions).send();
 		 mode = "FEED";
@@ -183,8 +182,6 @@ INLINE_METHODS void TranslateInput_Actor::transition3_gotInput( const void * rtd
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_Nd20kDXeEfGJaL0kWrhu3A
 input = (const char *)rtdata;
-std::cout << "\nGOT INPUT: " << input << " MODE: " << mode << std::endl;
-
 //}}}USR
 }
 

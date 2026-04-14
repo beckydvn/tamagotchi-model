@@ -271,10 +271,10 @@ triggerInputPort.triggerInput().send();
 int Update_Actor::determineChange( int var, int change )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_dgtjUDeCEfGJaL0kWrhu3A
-if(var + change < 0 || (var + change >= 10)){
-	return 0;
-}
-return change;
+int new_var = var + change;
+if (new_var > 10) return 10 - var;  // only go up to 10
+if (new_var < 0)  return -var;      // only go down to 0
+return change;                       // change is fine as-is
 //}}}USR
 }
 

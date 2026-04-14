@@ -25,7 +25,6 @@ Feed_Actor::~Feed_Actor( void )
 INLINE_METHODS void Feed_Actor::enter3_Initiate_Feed( void )
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_659mEDaiEfGJaL0kWrhu3A
-std::cout << "\nFEEDING TAMA" << std::endl;
 triggerInputPort.triggerInput().send();
 //}}}USR
 }
@@ -61,6 +60,7 @@ INLINE_METHODS void Feed_Actor::transition4_snackCount_3( const void * rtdata, F
 {
 //{{{USR platform:/resource/Tamagotchi/CPPModel.emx#_AJn4MDX7EfGJaL0kWrhu3A
 updateValPort.updateHunger(-2).send();
+updateValPort.updateHappiness(2).send();
 std::cout<< "\nATE THE SNACK..." <<std::endl;
 //}}}USR
 }
